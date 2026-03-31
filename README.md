@@ -54,4 +54,20 @@ runtimeOnly 'org.postgresql:postgresql'
 
 <img width="959" height="503" alt="image" src="https://github.com/user-attachments/assets/6df1d047-a1bf-487b-8351-beac0cb7253f" />
 
+🔗 2단계: 마법의 DB 주소 입력하기
+이제 진짜 주소를 알려줄 차례야.
 
+인텔리제이 왼쪽 파일 목록에서 src ➔ main ➔ resources 폴더를 열면, 그 안에 application.properties (또는 application.yml) 파일이 있을 거야. 더블클릭해서 열어줘.
+
+파일 안에 아래 코드를 통째로 복사해서 붙여넣어 줘.
+
+```
+# 데이터베이스 연결 주소 (여기에 아까 만든 주소를 넣을 거야!) 이 주소 절대 공개 금지(털려서...) ai한테도 당장 금지 나중에 .env파일을 분리하겠습니
+spring.datasource.url=여기를_지우고_아까_완성한_긴_주소를_통째로_붙여넣어주세요
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA (스프링 부트 <-> DB 번역기) 설정
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
