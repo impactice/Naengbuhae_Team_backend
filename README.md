@@ -5,7 +5,11 @@
 ## spring boot 세팅 
 
 ## Java(JDK 17 버전을 사용) - Amazon Corretto 17   
-https://aws.amazon.com/ko/corretto/
+링크: https://aws.amazon.com/ko/corretto/  
+화면에서 'Amazon Corretto 17 다운로드' 링크나 버튼을 찾아서 클릭  
+Windows x64 줄에 있는 .msi 파일을 클릭해서 다운로드  
+다운받은 설치 파일을 실행  
+
 개발 툴(IDE): IntelliJ IDEA (인텔리제이)를 사용 
 
 <img width="1919" height="948" alt="spring boot" src="https://github.com/user-attachments/assets/c4b2d36b-580f-48ad-b06f-0402c1b27ae5" />
