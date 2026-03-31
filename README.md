@@ -4,6 +4,8 @@
 
 ## spring boot 세팅 
 
+Java(JDK 17 버전을 사용) - Amazon Corretto 17 
+
 <img width="1919" height="948" alt="spring boot" src="https://github.com/user-attachments/assets/c4b2d36b-580f-48ad-b06f-0402c1b27ae5" />
 
 ## 데이터베이스 구축하기 
