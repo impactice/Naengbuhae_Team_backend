@@ -154,8 +154,35 @@ implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 2. [New] ➔ [File] 을 누르고, 파일 이름을 정확히 .env 라고 적고 엔터를 쳐.
 3. 만들어진 .env 파일 안에 아래처럼 네 진짜 정보를 적어줘! (여긴 띄어쓰기나 따옴표 없이 적는 게 좋아)
 
+🙈 3단계: 깃허브에서 .env 완벽하게 숨기기 (가장 중요!!!)
+금고를 만들었으니, 깃허브라는 공개 광장에 이 금고가 올라가지 않도록 투명 망토를 씌워야 해!
 
+1. 프로젝트 맨 꼭대기 폴더에 보면 .gitignore 라는 파일이 이미 있을 거야. (이게 투명 망토 파일이야!) 열어줘.
+2. 파일 맨 아래 빈 공간에 딱 이렇게 한 줄을 추가해 줘.
 
+```
+# 환경변수 파일 숨기기
+.env
+```
+이러면 깃허브 데스크탑 같은 곳에서 .env 파일이 아예 안 보이게 돼서, 절대 실수로 올라갈 일이 없어!  
 
+🔄 4단계: application.properties 수정하기
+이제 원래 파일로 돌아가서, "내 진짜 비밀번호는 .env 금고 안에 있으니까 거기서 꺼내 써!" 라고 연결해 주면 끝이야.
 
+application.properties 파일을 열고 아까 적었던 부분을 이렇게 수정해 줘:
 
+```
+spring.application.name=Naengbuhae
+
+# 주소는 안 가려도 됨!
+spring.datasource.url=jdbc:postgresql://db.lulvkjjxtmnvvqvnatbp.supabase.co:6543/postgres
+
+# .env 금고에서 가져오기! (달러 기호랑 중괄호 필수)
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
