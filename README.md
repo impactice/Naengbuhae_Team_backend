@@ -115,7 +115,23 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 ```
 
+## 해결 
+```
+spring.application.name=Naengbuhae
 
+spring.datasource.url=jdbc:postgresql://db.lulvkjjxtmnvvqvnatbp.supabase.co:6543/postgres
+
+spring.datasource.username=postgres
+# 데이터베이스 연결 주소 이 주소 절대 공개 금지(털려서...) ai한테도 당장 금지 나중에 .env파일을 분리하겠습니다
+spring.datasource.password=여기에_비번을_넣어요
+
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+이걸로 하고 휴대폰 핫스팟을 켜서 되니 연결이 됨
 
 
 
