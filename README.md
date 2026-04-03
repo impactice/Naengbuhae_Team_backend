@@ -770,4 +770,30 @@ public class RecipeController {
 
 <img width="1919" height="1007" alt="image" src="https://github.com/user-attachments/assets/d9b0b942-b6ab-499c-9e92-0b324ce5f8a8" />
 
+## 지금까지 한 거 정리 
 
+📦 Naengbuhae (스마트 냉장고 관리 백엔드)
+ ┣ 📂 src/main/java/com/example/Naengbuhae
+ │ ┣ 📂 controller       # 클라이언트의 요청을 받고 응답하는 안내 데스크
+ │ │ ┣ 📜 IngredientController.java
+ │ │ ┗ 📜 RecipeController.java
+ │ │
+ │ ┣ 📂 domain           # DB 테이블과 직접 연결되는 설계도 (Entity)
+ │ │ ┣ 📜 Ingredient.java
+ │ │ ┗ 📜 Recipe.java
+ │ │
+ │ ┣ 📂 dto              # 계층 간 데이터를 안전하게 주고받는 택배 상자
+ │ │ ┣ 📜 IngredientRequestDto.java
+ │ │ ┣ 📜 IngredientResponseDto.java
+ │ │ ┣ 📜 RecipeRequestDto.java
+ │ │ ┗ 📜 RecipeResponseDto.java
+ │ │
+ │ ┣ 📂 repository       # DB 창고에 접근해서 데이터를 넣고 빼는 창고지기
+ │ │ ┣ 📜 IngredientRepository.java
+ │ │ ┗ 📜 RecipeRepository.java
+ │ │
+ │ ┗ 📂 service          # 핵심 비즈니스 로직을 처리하는 두뇌
+ │   ┣ 📜 IngredientService.java
+ │   ┗ 📜 RecipeService.java
+ │
+ ┗ 📜 build.gradle       # 외부 라이브러리(Swagger 등) 의존성 관리
