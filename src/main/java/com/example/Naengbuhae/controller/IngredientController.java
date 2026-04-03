@@ -26,4 +26,13 @@ public class IngredientController {
     public List<IngredientResponseDto> list() {
         return ingredientService.findAllIngredients();
     }
+
+    // --- API 3: 식재료 삭제하기 (DELETE 요청) ---
+    // @DeleteMapping: 누군가 주소 뒤에 번호(id)를 달고 DELETE 요청을 보내면 실행됨
+    // 예: /api/ingredients/1 (1번 지워줘!)
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+        ingredientService.deleteIngredient(id);
+        return id + "번 식재료가 냉장고에서 삭제되었습니다! 🗑️";
+    }
 }

@@ -32,4 +32,11 @@ public class IngredientService {
                 .map(IngredientResponseDto::new) // Ingredient 원본을 ResponseDto로 포장하는 마법의 코드
                 .collect(Collectors.toList());
     }
+
+    // --- 3. 식재료 삭제 기능 ---
+    @Transactional
+    public void deleteIngredient(Long id) {
+        // 창고지기한테 "이 번호표(id) 가진 식재료 찾아서 버려!" 라고 시킴
+        ingredientRepository.deleteById(id);
+    }
 }
