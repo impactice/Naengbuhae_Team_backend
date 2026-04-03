@@ -634,3 +634,127 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 }
 ```
 
+## 레시피 전용 택배 상자(DTO) 2개랑, 두뇌(Service), 안내 데스크(Controller) 코드
+
+RecipeRequestDto.java
+```
+package com.example.Naengbuhae.dto;
+
+import com.example.Naengbuhae.domain.Recipe;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter @Setter
+@NoArgsConstructor
+public class RecipeRequestDto {
+
+    private String title;
+    private String instructions;
+    private Integer cookingTime;
+
+    // DTO를 DB용 엔티티로 찰떡 변환!
+    public Recipe toEntity() {
+        return new Recipe(title, instructions, cookingTime);
+    }
+}
+```
+
+RecipeResponseDto.java
+```
+package com.example.Naengbuhae.dto;
+
+import com.example.Naengbuhae.domain.Recipe;
+import lombok.Getter;
+
+@Getter
+public class RecipeResponseDto {
+
+    private Long id;
+    private String title;
+    private String instructions;
+    private Integer cookingTime;
+
+    // DB에서 꺼낸 엔티티를 이 DTO 상자에 예쁘게 포장!
+    public RecipeResponseDto(Recipe recipe) {
+        this.id = recipe.getId();
+        this.title = recipe.getTitle();
+        this.instructions = recipe.getInstructions();
+        this.cookingTime = recipe.getCookingTime();
+    }
+}
+```
+
+RecipeService.java
+```
+package com.example.Naengbuhae.service;
+
+import com.example.Naengbuhae.domain.Recipe;
+import com.example.Naengbuhae.dto.RecipeRequestDto;
+import com.example.Naengbuhae.dto.RecipeResponseDto;
+import com.example.Naengbuhae.repository.RecipeRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class RecipeService {
+
+    private final RecipeRepository recipeRepository;
+
+    // 1. 레시피 저장 (Create)
+    @Transactional
+    public Long saveRecipe(RecipeRequestDto requestDto) {
+        return recipeRepository.save(requestDto.toEntity()).getId();
+    }
+
+    // 2. 레시피 전체 조회 (Read)
+    public List<RecipeResponseDto> findAllRecipes() {
+        return recipeRepository.findAll().stream()
+                .map(RecipeResponseDto::new)
+                .collect(Collectors.toList());
+    }
+    
+    // (일단 가장 기본이 되는 등록/조회만 뚫어둘게! 수정/삭제는 나중에 필요하면 추가!)
+}
+```
+
+RecipeController.java
+```
+package com.example.Naengbuhae.controller;
+
+import com.example.Naengbuhae.dto.RecipeRequestDto;
+import com.example.Naengbuhae.dto.RecipeResponseDto;
+import com.example.Naengbuhae.service.RecipeService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+// 주의: 주소가 이번엔 /api/recipes 야!
+@RequestMapping("/api/recipes")
+@RequiredArgsConstructor
+public class RecipeController {
+
+    private final RecipeService recipeService;
+
+    // POST: 레시피 등록 API
+    @PostMapping
+    public Long create(@RequestBody RecipeRequestDto requestDto) {
+        return recipeService.saveRecipe(requestDto);
+    }
+
+    // GET: 레시피 전체 조회 API
+    @GetMapping
+    public List<RecipeResponseDto> list() {
+        return recipeService.findAllRecipes();
+    }
+}
+```
+
