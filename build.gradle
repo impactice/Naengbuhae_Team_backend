@@ -35,6 +35,8 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     runtimeOnly 'org.postgresql:postgresql' // supabase 데이터 연결
     implementation 'me.paulschwarz:spring-dotenv:4.0.0' //.env파일 읽게
+    // Swagger (springdoc-openapi)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
 }
 
 tasks.named('test') {
