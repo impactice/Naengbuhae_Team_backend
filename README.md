@@ -560,10 +560,6 @@ IngredientController.java
     }
 ```
 
-
-
-
-
 ## 계란 10개 -> 8개로 줄여보기 테스트!
 
 <img width="1919" height="1004" alt="image" src="https://github.com/user-attachments/assets/150c3bb3-9af1-4368-880c-a1bb591c0ab1" />
@@ -575,6 +571,19 @@ curl.exe -X PUT http://localhost:8080/api/ingredients/2 -H "Content-Type: applic
 ```
 
 <img width="1919" height="1007" alt="image" src="https://github.com/user-attachments/assets/385d271d-b2dd-4292-9153-41f1fcb94d17" />
+
+## 스웨거(Swagger) 
+
+build.gradle  
+dependencies { ... } 에 추가
+```
+// Swagger (springdoc-openapi)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+```
+
+<img width="400" height="201" alt="image" src="https://github.com/user-attachments/assets/79858825-803b-4fad-a991-4a8236d92141" />
+코끼리 누르기 
+
 
 
 
