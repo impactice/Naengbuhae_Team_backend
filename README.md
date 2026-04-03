@@ -526,4 +526,55 @@ curl.exe -X DELETE http://localhost:8080/api/ingredients/1
 
 <img width="1919" height="1003" alt="image" src="https://github.com/user-attachments/assets/7007d057-7d33-4c64-b9a2-0bc06b8d8926" />
 
+## 식재료 수정(Update) 기능 추가 
+
+IngredientService.java
+```
+// --- 4. 식재료 수정 기능 (Update) ---
+    // @Transactional이 여기서 진짜 중요한 마법을 부림!
+    @Transactional
+    public Long updateIngredient(Long id, IngredientRequestDto requestDto) {
+        // 1. 창고에서 수정할 식재료를 번호(id)로 찾아온다. (없으면 에러 뱉음!)
+        Ingredient ingredient = ingredientRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 식재료가 없습니다. id=" + id));
+
+        // 2. 찾아온 원본 식재료의 정보를 새 택배 상자(DTO)에 담긴 정보로 바꿔치기!
+        ingredient.setName(requestDto.getName());
+        ingredient.setQuantity(requestDto.getQuantity());
+        ingredient.setExpirationDate(requestDto.getExpirationDate());
+
+        // 3. 엥? 저장(save)을 안 하네?! 
+        // 👉 맞음! 스프링 JPA의 '변경 감지' 마법 덕분에 값만 바꿔도 알아서 DB에 덮어씌워짐!
+        return ingredient.getId();
+    }
+```
+
+IngredientController.java
+```
+// --- API 4: 식재료 수정하기 (PUT 요청) ---
+    // @PutMapping: 누군가 주소 뒤에 번호(id)를 달고 PUT(수정) 요청을 보내면 실행됨
+    @PutMapping("/{id}")
+    public Long update(@PathVariable Long id, @RequestBody IngredientRequestDto requestDto) {
+        // 두뇌(Service)에게 "id번 식재료를 이 새 정보(requestDto)로 바꿔줘!" 라고 시킴
+        return ingredientService.updateIngredient(id, requestDto);
+    }
+```
+
+
+
+
+
+## 계란 10개 -> 8개로 줄여보기 테스트!
+
+<img width="1919" height="1004" alt="image" src="https://github.com/user-attachments/assets/150c3bb3-9af1-4368-880c-a1bb591c0ab1" />
+
+성공 
+
+```
+curl.exe -X PUT http://localhost:8080/api/ingredients/2 -H "Content-Type: application/json" -d "{\"name\": \"계란\", \"quantity\": 8, \"expirationDate\": \"2026-04-15\"}"
+```
+
+<img width="1919" height="1007" alt="image" src="https://github.com/user-attachments/assets/385d271d-b2dd-4292-9153-41f1fcb94d17" />
+
+
 
