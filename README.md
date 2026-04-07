@@ -805,3 +805,78 @@ DTO의 특징
 - 보안성 강화: 엔티티를 그대로 노출하면 민감한 정보까지 외부에 드러날 수 있는데, DTO는 필요한 필드만 선택적으로 담아 전달합니다.
 - 유연성 확보: 엔티티 구조가 바뀌더라도 DTO를 통해 외부 API나 클라이언트와의 계약을 안정적으로 유지할 수 있습니다.
 - 변환 용이: 엔티티 ↔ DTO 간 변환을 통해 원하는 형태로 데이터를 가공할 수 있습니다.
+
+
+## 코드 통합하기
+
+com vs org, 뭐가 더 좋을까?
+무조건 com으로 통일하는 걸 추천해! 1. 대세는 com: 졸업 프로젝트로 끝나는 게 아니라 나중에 앱이나 웹 서비스로 출시한다고 생각했을 때, 대부분의 스타트업이나 상용 서비스는 com을 표준으로 써.
+
+JwtUtil.java,build.gradle,UserController.java,SecurityConfig.java등 바꾸고 .env파일 추
+
+🛠️ 스웨거(메뉴판) '프리패스' 등록하기
+config 폴더에 있는 SecurityConfig.java 파일을 열어서, .authorizeHttpRequests 부분을 아래처럼 살짝만 바꿔줘! 스웨거 관련 주소들을 프리패스(permitAll) 명단에 추가하는 거야.
+
+[수정 전]
+```
+.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/user/signup", "/user/login").permitAll()
+                .anyRequest().authenticated()
+        )
+```
+[수정 후]
+```
+.authorizeHttpRequests(auth -> auth
+                // 로그인, 회원가입 + 스웨거 관련 주소는 신분증 없이 프리패스!
+                .requestMatchers(
+                        "/user/signup", 
+                        "/user/login",
+                        "/swagger-ui/**", 
+                        "/v3/api-docs/**", 
+                        "/swagger-resources/**"
+                ).permitAll()
+                .anyRequest().authenticated() // 나머지는 다 신분증(JWT) 검사해!
+        )
+```
+
+
+
+🚨 근데 잠깐! 스웨거에 '자물쇠'가 없네?!
+
+이게 무슨 말이냐면, 로그인을 해서 'JWT 출입증'을 발급받아도, 지금 이 스웨거 메뉴판에는 그 출입증을 문지기한테 보여줄 구멍이 안 뚫려 있다는 뜻이야. 이대로 /api/ingredients에 재료를 추가하려고 하면 출입증을 못 내밀어서 또 403 거절을 당하게 돼!
+
+스웨거한테 "우리 이제 출입증 검사하는 기능 생겼으니까, 출입증 넣는 버튼 좀 만들어줘!"라고 알려주는 설정 파일 추가 
+
+스웨거 자물쇠(Authorize) 버튼 달아주기
+```
+package com.example.Naengbuhae.config;
+
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI openAPI() {
+        String jwtSchemeName = "JWT";
+        
+        // 1. 스웨거한테 "우리는 JWT라는 이름의 Bearer 토큰을 쓴다"고 알려주기
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
+        Components components = new Components()
+                .addSecuritySchemes(jwtSchemeName, new SecurityScheme()
+                        .name(jwtSchemeName)
+                        .type(SecurityScheme.Type.HTTP) // HTTP 방식
+                        .scheme("bearer") // Bearer 토큰 방식
+                        .bearerFormat("JWT")); // 토큰 형식은 JWT
+
+        return new OpenAPI()
+                .addSecurityItem(securityRequirement)
+                .components(components);
+    }
+}
+```
