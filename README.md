@@ -881,19 +881,4 @@ public class SwaggerConfig {
 }
 ```
 
-## 회원가입,로그인
-
-회원가입 됨
-<img width="1047" height="304" alt="image" src="https://github.com/user-attachments/assets/a3583b52-36cf-4f79-86d1-5ebf8e3cec0c" />
-
-로그인 됨
-<img width="1053" height="301" alt="image" src="https://github.com/user-attachments/assets/c3ed196e-56c0-4cc8-a503-4ef6c790653e" />
-
-스웨거에 출입증 제출 
-
-<img width="510" height="245" alt="image" src="https://github.com/user-attachments/assets/c4d70823-1c74-42ad-94a4-dd241be8becd" />
-
-내 코드랑 퓨전이 되었나? 
-
-<img width="1060" height="738" alt="image" src="https://github.com/user-attachments/assets/dd6255c4-7c11-4c84-b1d9-2f681e73eadf" />
 
