@@ -881,4 +881,49 @@ public class SwaggerConfig {
 }
 ```
 
-
+## 프로젝트 구조 
+```
+📦 Naengbuhae (스마트 냉장고 관리 백엔드)
+┣ 📂 src/main/java/com/example/Naengbuhae
+┃ ┣ 📂 config       # 🛡️ 문지기 & 도구함: CORS, JWT, 시큐리티, 스웨거 등 각종 설정 파일들
+┃ ┃ ┣ 📜 CorsConfig.java
+┃ ┃ ┣ 📜 JwtAuthenticationFilter.java
+┃ ┃ ┣ 📜 JwtUtil.java
+┃ ┃ ┣ 📜 SecurityConfig.java
+┃ ┃ ┗ 📜 SwaggerConfig.java
+┃ ┣ 📂 controller   # 🛎️ 안내데스크: 프론트엔드의 요청을 받고 응답을 보내는 API 창구
+┃ ┃ ┣ 📜 IngredientController.java
+┃ ┃ ┗ 📜 RecipeController.java
+┃ ┣ 📂 domain       # 🗄️ 데이터 설계도: DB 테이블과 똑같이 생긴 자바 객체(Entity)들
+┃ ┃ ┣ 📜 Ingredient.java
+┃ ┃ ┗ 📜 Recipe.java
+┃ ┣ 📂 dto          # 🚚 택배 상자: 클라이언트와 서버 간에 데이터를 주고받을 때 쓰는 포장지
+┃ ┃ ┣ 📜 IngredientRequestDto.java
+┃ ┃ ┣ 📜 IngredientResponseDto.java
+┃ ┃ ┣ 📜 RecipeRequestDto.java
+┃ ┃ ┗ 📜 RecipeResponseDto.java
+┃ ┣ 📂 repository   # 💾 창고 관리인: DB에 직접 접근해서 데이터를 저장, 조회, 삭제하는 역할
+┃ ┃ ┣ 📜 IngredientRepository.java
+┃ ┃ ┗ 📜 RecipeRepository.java
+┃ ┣ 📂 service      # 👨‍🍳 요리사: 컨트롤러가 넘겨준 데이터로 실제 비즈니스 로직을 처리하는 곳
+┃ ┃ ┣ 📜 IngredientService.java
+┃ ┃ ┗ 📜 RecipeService.java
+┃ ┗ 📂 user         # 👤 회원 전용관: 회원가입, 로그인 등 유저 관련 기능이 모여있는 곳
+┃   ┣ 📜 ApiResponse.java
+┃   ┣ 📜 LoginRequest.java
+┃   ┣ 📜 LoginResponse.java
+┃   ┣ 📜 SignupRequest.java
+┃   ┣ 📜 User.java
+┃   ┣ 📜 UserController.java
+┃   ┣ 📜 UserRepository.java
+┃   ┗ 📜 UserService.java
+┣ 📂 src/main/resources
+┃ ┣ 📜 application.properties  # ⚙️ 앱 핵심 설정: DB 주소, 포트 번호 등 프로젝트 전반의 환경설정
+┃ ┣ 📂 static                  # 🖼️ 정적 파일 보관: 이미지, CSS 등 (React 연동으로 현재 비어있음)
+┃ ┗ 📂 templates               # 📄 HTML 보관: 서버 사이드 렌더링 화면 (현재 비어있음)
+┣ 📂 src/test                  # 🧪 실험실: 작성한 코드가 잘 돌아가는지 테스트하는 곳
+┃ ┗ 📜 NaengbuhaeApplicationTests.java
+┣ 📜 .env                      # 🤫 1급 비밀: JWT 시크릿 키 등을 숨겨두는 곳 (깃허브 업로드 절대 금지!)
+┣ 📜 build.gradle              # 🐘 부품 주문서: 스프링 부트 버전 및 프로젝트에 필요한 외부 라이브러리 목록
+┗ 📜 settings.gradle           # 🏷️ 프로젝트 이름 설정
+```
