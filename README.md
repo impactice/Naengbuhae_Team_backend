@@ -928,7 +928,7 @@ public class SwaggerConfig {
 ┗ 📜 settings.gradle           # 🏷️ 프로젝트 이름 설정
 ```
 
-## feat: 식재료 유효성 검사 및 전역 예외 처리 적용 완료
+## 식재료 유효성 검사 및 전역 예외 처리 적용 완료
 IngredientController.java
 ```
 package com.example.Naengbuhae.controller;
