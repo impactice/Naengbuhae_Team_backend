@@ -927,3 +927,220 @@ public class SwaggerConfig {
 ┣ 📜 build.gradle              # 🐘 부품 주문서: 스프링 부트 버전 및 프로젝트에 필요한 외부 라이브러리 목록
 ┗ 📜 settings.gradle           # 🏷️ 프로젝트 이름 설정
 ```
+
+## feat: 식재료 유효성 검사 및 전역 예외 처리 적용 완료
+IngredientController.java
+```
+package com.example.Naengbuhae.controller;
+
+import com.example.Naengbuhae.dto.IngredientRequestDto;
+import com.example.Naengbuhae.dto.IngredientResponseDto;
+import com.example.Naengbuhae.service.IngredientService;
+import jakarta.validation.Valid; // 방어막 부품 딱 하나만 추가 임포트!
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/ingredients")
+@RequiredArgsConstructor
+public class IngredientController {
+
+    private final IngredientService ingredientService;
+
+    // POST: 저장 요청이 오면 '받는 택배 상자(RequestDto)'로 안전하게 받기
+    // @RequestBody 앞에 @Valid 방어막 추가!
+    @PostMapping
+    public Long create(@Valid @RequestBody IngredientRequestDto requestDto) {
+        return ingredientService.saveIngredient(requestDto);
+    }
+
+    // GET: 전체 조회 요청이 오면 원본 말고 '보내는 택배 상자(ResponseDto)' 리스트로 안전하게 내보내기
+    @GetMapping
+    public List<IngredientResponseDto> list() {
+        return ingredientService.findAllIngredients();
+    }
+
+    // --- API 3: 식재료 삭제하기 (DELETE 요청) ---
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+        ingredientService.deleteIngredient(id);
+        return id + "번 식재료가 냉장고에서 삭제되었습니다! 🗑️";
+    }
+
+    // --- API 4: 식재료 수정하기 (PUT 요청) ---
+    //  수정할 때도 이상한 값 들어오면 안 되니까 여기도 @Valid 방어막 추가!
+    @PutMapping("/{id}")
+    public Long update(@PathVariable Long id, @Valid @RequestBody IngredientRequestDto requestDto) {
+        // 두뇌(Service)에게 "id번 식재료를 이 새 정보(requestDto)로 바꿔줘!" 라고 시킴
+        return ingredientService.updateIngredient(id, requestDto);
+    }
+}
+```
+IngredientRequestDto.java
+```
+package com.example.Naengbuhae.dto;
+
+import com.example.Naengbuhae.domain.Ingredient;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class IngredientRequestDto {
+
+    @NotBlank(message = "식재료 이름은 필수입니다!")
+    private String name;
+
+    @NotNull(message = "수량은 필수 입력값입니다!")
+    @Min(value = 1, message = "수량은 최소 1개 이상이어야 합니다!")
+    private Integer quantity;
+
+    @NotNull(message = "유통기한은 필수 입력값입니다!")
+    @FutureOrPresent(message = "유통기한은 오늘 또는 미래의 날짜여야 합니다!")
+    private LocalDate expirationDate;
+
+    // 편의 기능: "이 택배 상자(DTO)에 든 내용물을 실제 DB용 식재료(Entity)로 변환해 줘!"
+    public Ingredient toEntity() {
+        return new Ingredient(name, quantity, expirationDate);
+    }
+}
+```
+build.gradle
+```
+// 유효성 검사 (Validation) 방어막 추가!
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+```
+
+SecurityConfig.java(이 부분은 BCrypt,JWT 검증이 아직 구현이 안 되어서 임의로 뚫음..)
+```
+package com.example.Naengbuhae.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // 추가: 비밀번호 암호화 클래스
+import org.springframework.security.crypto.password.PasswordEncoder; // 추가: 암호화 인터페이스
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    // 암호화 빈(Bean)! 서버 에러 방지용!
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception { // 주의: http.build() 때문에 throws Exception이 있어야 해!
+        http
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth // 이 코드 수정 이유는 스웨거(Swagger) 메뉴판이랑 호환이 안 되어서..
+                        // 로그인, 회원가입 + 스웨거 관련 주소는 신분증 없이 프리패스!
+                        .requestMatchers(
+                                "/user/signup",
+                                "/user/login",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/api/ingredients", // 테스트를 위해 임시로 만든 통로2
+                                "/api/ingredients/**",// 테스트를 위해 임시로 만든 통로
+                                "/error" //에러를 출력하기 위한
+                        ).permitAll()
+                        .anyRequest().authenticated() // 나머지는 다 신분증(JWT) 검사해!
+                );
+                //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+}
+```
+GlobalExceptionHandler.java(new)
+```
+package com.example.Naengbuhae.exception;
+
+import io.swagger.v3.oas.annotations.Hidden;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+// 스프링부트는 정책상 에러가 나도 보여주지 않는데 예외처리를 하므로 인해서 에러를 보여준다
+@Hidden // 스웨거 투명 망토 (스웨거가 이 파일을 무시하게 만듦)
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    // @Valid 방어막에 걸려서 튕겨났을 때 발생하는 에러만 쏙 낚아챔!
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+
+        // DTO에 적어둔 예쁜 에러 메시지("수량은 최소 1개 이상이어야 합니다!") 추출하기
+        String errorMessage = ex.getBindingResult()
+                .getAllErrors()
+                .get(0)
+                .getDefaultMessage();
+
+        // 까만 창에 400 Bad Request와 함께 메시지를 뱉어줌!
+        return ResponseEntity.badRequest().body(errorMessage);
+    }
+}
+```
+
+## 지금까지 한 거 파일 구조 
+
+```
+Naengbuhae
+ ┣ 📂 src/main/java/com/example/Naengbuhae
+ ┃ ┣ 📂 config                  // 🛡️ 보안 및 각종 설정 담당
+ ┃ ┃ ┣ 📜 SecurityConfig.java         // 보안 규칙, 프리패스 설정 (수정 중)
+ ┃ ┃ ┗ 📜 JwtAuthenticationFilter.java // 출입증 검사기 (앞으로 완성할 곳!)
+ ┃ ┣ 📂 controller              // 🚪 클라이언트의 요청을 받는 문
+ ┃ ┃ ┣ 📜 IngredientController.java
+ ┃ ┃ ┣ 📜 RecipeController.java
+ ┃ ┃ ┗ 📜 UserController.java         // 회원가입, 로그인 요청을 받는 곳
+ ┃ ┣ 📂 domain                  // 📦 실제 DB 테이블과 매핑되는 핵심 데이터 (엔티티)
+ ┃ ┃ ┣ 📜 Ingredient.java
+ ┃ ┃ ┗ 📜 User.java                   // 유저 정보 (비밀번호가 저장될 곳)
+ ┃ ┣ 📂 dto                     // 🚚 데이터를 실어 나르는 택배 상자
+ ┃ ┃ ┣ 📜 IngredientRequestDto.java
+ ┃ ┃ ┣ 📜 IngredientResponseDto.java
+ ┃ ┃ ┗ ... (유저 관련 DTO들)
+ ┃ ┣ 📂 exception               // 🚨 에러 처리 전담반
+ ┃ ┃ ┗ 📜 GlobalExceptionHandler.java // 아까 만든 예쁜 에러 배달부
+ ┃ ┣ 📂 repository              // 🗄️ DB에 직접 접근해서 데이터를 넣고 빼는 창고 관리자
+ ┃ ┃ ┗ 📜 UserRepository.java
+ ┃ ┣ 📂 service                 // 🧠 실제 비즈니스 로직(계산, 검증)을 처리하는 두뇌
+ ┃ ┃ ┣ 📜 IngredientService.java
+ ┃ ┃ ┗ 📜 UserService.java            // 비밀번호를 암호화하고 로그인을 처리할 곳 (앞으로 완성할 곳!)
+ ┃ ┗ 📜 NaengbuhaeApplication.java  // 🚀 스프링 부트 서버 실행의 심장
+ ┃
+ ┣ 📂 src/main/resources
+ ┃ ┣ 📜 application.yml (또는 properties) // DB 연결 및 프로젝트 환경 설정
+ ┃ ┗ 📜 .env                          // JWT 시크릿 키 등 비밀 정보 숨겨둔 곳
+ ┗ 📜 build.gradle                  // 🐘 외부 부품(라이브러리) 명세서
+```
