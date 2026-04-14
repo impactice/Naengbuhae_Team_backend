@@ -1144,3 +1144,45 @@ Naengbuhae
  ┃ ┗ 📜 .env                          // JWT 시크릿 키 등 비밀 정보 숨겨둔 곳
  ┗ 📜 build.gradle                  // 🐘 외부 부품(라이브러리) 명세서
 ```
+
+### 프론트랑 백엔드 로그인 확인 
+SecurityConfig.java (코드 추가)
+```
+// ... 기존 코드들 ...
+    import org.springframework.web.cors.CorsConfiguration;
+    import org.springframework.web.cors.CorsConfigurationSource;
+    import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+    import java.util.List;
+
+    // (클래스 맨 밑쪽에 추가!)
+    // 🛡️ CORS 에러 방어막: "우리 프론트엔드가 보내는 요청은 다 받아줘!"
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // 🚨 프론트엔드가 켜진 포트 번호(보통 3000 또는 5173)를 적어줘야 해!
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173")); 
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // JWT 토큰을 주고받으려면 이거 꼭 true여야 해!
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 주소(/**)에 이 규칙을 적용!
+        return source;
+    }
+}
+```
+
+프론트 코드 다운을 받고 폴더를 이동시킨 뒤에 
+
+```
+npm install
+```
+위 명령어로 필요한 파일을 다운
+```
+npm run dev
+```
+위 명령어로 실행 
+
+<img width="1190" height="492" alt="image" src="https://github.com/user-attachments/assets/4326637b-43bf-428f-8b2a-e01240f20a3b" />
+
+로그인 기능은 정상적으로 작동됨
