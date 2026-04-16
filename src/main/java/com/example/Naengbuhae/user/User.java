@@ -1,3 +1,4 @@
+/*
 package com.example.Naengbuhae.user;
 
 import jakarta.persistence.Entity;
@@ -45,5 +46,53 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+}
+
+ */
+
+
+package com.example.Naengbuhae.user;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String username;
+
+    @Column(nullable = false)
+    private String password;
+
+    protected User() {
+    }
+
+    // 회원가입용 생성자
+    public User(String username, String encodedPassword) {
+        this.username = username;
+        this.password = encodedPassword;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    // 비밀번호 변경 기능
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 }
