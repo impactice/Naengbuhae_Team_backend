@@ -1186,3 +1186,32 @@ npm run dev
 <img width="1190" height="492" alt="image" src="https://github.com/user-attachments/assets/4326637b-43bf-428f-8b2a-e01240f20a3b" />
 
 로그인 기능은 정상적으로 작동됨
+
+### 식재료-유저 연관관계 매핑 및 개인 냉장고 데이터 격리 로직 구현
+
+총 5개의 파일이 변경  
+주요 변경 내용은 "누가 이 식재료를 넣었는가"를 기록하고, "내 데이터만 관리"하도록 보안 로직을 강화한 것
+
+  1. Ingredient.java (엔티티 수정)
+   * 변경 사항: User 객체와의 연관 관계(@ManyToOne)를 추가
+   * 이유: 식재료 데이터가 저장될 때 DB에 user_id를 함께 저장하여 소유자를 구분하기 위함
+
+  2. IngredientRepository.java (조회 메서드 추가)
+   * 변경 사항: List<Ingredient> findByUser(User user) 메서드를 추가
+   * 이유: 기존에는 findAll()로 모든 데이터를 가져왔으나, 이제는 특정 사용자의 것만 골라오기 위한 기능이 필요해졌기 때문
+
+  3. IngredientRequestDto.java (데이터 변환 로직 수정)
+   * 변경 사항: toEntity() 메서드가 User 객체를 인자로 받도록 수정
+   * 이유: DTO를 실제 DB 저장용 객체(Entity)로 바꿀 때, 현재 로그인한 사용자 정보를 함께 넣어서 생성하기 위함
+
+  4. IngredientService.java (핵심 비즈니스 로직 수정)
+   * 저장: 로그인한 사용자의 ID를 찾아 식재료와 연결해 저장
+   * 조회: 전체 조회가 아닌 findByUser를 호출하여 내 냉장고 데이터만 가져옴
+   * 수정/삭제: if (!ingredient.getUser().getUsername().equals(username)) 로직을 추가, 다른 사람이 내 식재료를 지우거나 바꾸지 못하도록 본인 확인 절차를 넣음
+
+  5. IngredientController.java (API 입구 수정)
+   * 변경 사항: 모든 메서드에 Principal principal 파라미터를 추가
+   * 이유: Spring Security가 제공하는 Principal 객체를 통해 현재 어떤 사용자가 로그인 중인지(토큰 주인)를 확인하고, 그 이름을 서비스 계층으로 넘겨주기 위함
+
+밑의 사진은 데이터 유저를 찾아서 성공적으로 들어간 것
+<img width="1276" height="365" alt="image" src="https://github.com/user-attachments/assets/9249d120-f549-4728-abdb-6faf6b0e8c8c" />
