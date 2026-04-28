@@ -1298,3 +1298,9 @@ if (username.equals("admin")) {
 2. **권한별 접근 테스트:** * `ADMIN` 권한 유저: 전체 유저 목록 조회 성공 (`200 OK`)
    * `USER` 권한 유저: 접근 차단 확인 (`403 Forbidden`)
 3. **인증 예외 경로 확인:** 토큰 없이 로그인/회원가입/스웨거 페이지 접근 정상 작동 확인.
+
+<img width="512" height="232" alt="image" src="https://github.com/user-attachments/assets/f3da7d51-5f19-47ff-9f81-4c09671f23e2" />
+
+<img width="512" height="301" alt="image" src="https://github.com/user-attachments/assets/def0942d-e16f-4a11-9c1c-326fe465ee7d" />
+
+<img width="512" height="255" alt="image" src="https://github.com/user-attachments/assets/cac2378e-d794-4631-bef2-9194979a72e1" />
