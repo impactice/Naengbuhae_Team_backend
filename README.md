@@ -1330,3 +1330,26 @@ if (username.equals("admin")) {
 <img width="1060" height="250" alt="image" src="https://github.com/user-attachments/assets/b46881fa-5efe-44ef-b346-16cd5724f926" />
 
 <img width="1061" height="532" alt="image" src="https://github.com/user-attachments/assets/35bb259d-6011-486b-8cfa-c0f279f4241f" />
+
+
+### 🔎 [기능 구현] 관리자 전용 전체 레시피 조회 (모니터링)
+
+서비스 내에 등록된 모든 레시피 콘텐츠를 통합적으로 모니터링하고 관리하기 위해, 사용자 필터링이 배제된 **관리자 전용 전체 조회 API**를 구현했습니다.
+
+#### 📄 1. 주요 변경 및 추가 사항
+* **`AdminController.java`:** `GET /admin/recipes` 엔드포인트를 추가하여 관리자 전용 데이터 접근 경로를 분리했습니다.
+* **`RecipeService.java`:** * `getAllRecipesByAdmin()` 메서드를 신설하여, 본인 작성 여부와 관계없이 DB 내 모든 레시피(`findAll()`)를 조회하도록 로직을 구성했습니다.
+* **`RecipeResponseDto.java`:** * 레시피 반환 데이터에 **작성자 식별 정보(`username`)** 필드를 추가했습니다. 이를 통해 관리자 대시보드에서 각 콘텐츠의 출처(작성자)를 직관적으로 파악할 수 있도록 개선했습니다.
+
+#### 🛠️ 2. 보안 및 설계 전략
+* **데이터 무결성 유지:** 관리자용 조회 로직을 독립된 서비스 메서드로 분리하여, 기존 일반 유저의 '내 레시피 조회' 기능 로직과 섞이거나 충돌하지 않도록 안전하게 격리했습니다.
+* **보안 계층 강화:** `@PreAuthorize("hasRole('ADMIN')")` 어노테이션을 적용하여 마스터키(ADMIN 토큰)가 없는 사용자의 무단 데이터 크롤링 및 접근을 완벽하게 차단했습니다.
+
+#### 💡 검증 완료 내역
+1. **데이터 통합 조회:** 타겟 유저(예: `test`)가 작성한 레시피 데이터가 `admin` 계정의 요청 시에도 정상적으로 반환됨을 확인했습니다.
+2. **DTO 매핑 검증:** 응답 JSON에 `username` 속성이 정상적으로 포함되어 렌더링됨을 확인했습니다 (`HTTP 200 OK`).
+
+<img width="1425" height="315" alt="image" src="https://github.com/user-attachments/assets/7b3602aa-08fc-423e-8c7a-29576fe421e0" />
+
+<img width="1397" height="475" alt="image" src="https://github.com/user-attachments/assets/0b1c8801-9100-472e-8ccb-684f80035547" />
+
