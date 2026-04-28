@@ -1304,3 +1304,29 @@ if (username.equals("admin")) {
 <img width="512" height="301" alt="image" src="https://github.com/user-attachments/assets/def0942d-e16f-4a11-9c1c-326fe465ee7d" />
 
 <img width="512" height="255" alt="image" src="https://github.com/user-attachments/assets/cac2378e-d794-4631-bef2-9194979a72e1" />
+
+
+### 🗑️ [기능 구현] 관리자 전용 레시피 강제 삭제 기능
+
+부적절하거나 운영 정책에 위배되는 콘텐츠를 신속하게 관리하기 위해, 일반 유저의 권한을 상회하는 **관리자 전용 강제 삭제 API**를 추가 구현했습니다.
+
+#### 📄 1. 주요 변경 및 추가 사항
+* **`AdminController.java`:** `DELETE /admin/recipes/{recipeId}` 엔드포인트를 추가하여 관리자 전용 명령 통로를 확장했습니다.
+* **`RecipeService.java`:** * `deleteRecipeByAdmin(Long id)` 메서드를 신설했습니다.
+  * 기존 일반 삭제 로직과 달리 **작성자 본인 확인 절차(Ownership Check)를 생략**하고, 관리자의 권한으로 DB에서 데이터를 즉각 삭제하는 비즈니스 로직을 구축했습니다.
+  * `@Transactional` 어노테이션을 적용하여 삭제 과정 중 발생할 수 있는 데이터 무결성 오류에 대비했습니다.
+
+#### 🛠️ 2. 보안 및 설계 전략
+* **권한 분리(Decoupling):** 일반 유저의 삭제 요청과 관리자의 강제 삭제 요청을 서비스 계층에서 별도의 메서드로 분리하여, 로직의 복잡도를 낮추고 사이드 이펙트를 최소화했습니다.
+* **RBAC 보안 강화:** 컨트롤러 계층에서 `@PreAuthorize("hasRole('ADMIN')")`를 통해 2차 검증을 수행함으로써, 비인가된 사용자의 접근을 원천 차단했습니다.
+
+#### 💡 검증 완료 내역
+1. **DB 정합성 확인:** 관리자 API 호출 후 Supabase DB에서 해당 레시피 데이터가 즉시 삭제됨을 확인했습니다.
+2. **응답 메시지 검증:** 삭제 성공 시 "O번 레시피가 관리자에 의해 강제 삭제되었습니다."라는 명확한 메시지를 반환하여 운영 편의성을 높였습니다.
+3. **접근 제어 테스트:** * `ADMIN` 토큰 사용 시: 삭제 성공 (`200 OK`)
+   * 일반 `USER` 토큰 사용 시: 접근 거부 (`403 Forbidden`)
+
+
+<img width="1060" height="250" alt="image" src="https://github.com/user-attachments/assets/b46881fa-5efe-44ef-b346-16cd5724f926" />
+
+<img width="1061" height="532" alt="image" src="https://github.com/user-attachments/assets/35bb259d-6011-486b-8cfa-c0f279f4241f" />
