@@ -1230,3 +1230,39 @@ npm run dev
 
 밑에 있는 이미지는 데이터베이스에 제대로 들어가는지 확인된 거
 <img width="1194" height="164" alt="image" src="https://github.com/user-attachments/assets/7f028163-1f11-45d2-8b08-fb5957a5c0a2" />
+
+
+### 🔐 [기능 구현] 스프링 시큐리티 기반 유저 역할(Role) 시스템 도입
+
+관리자 전용 기능(데이터 관리, 모니터링 등)을 확장하기 위해, Spring Security와 JWT를 활용한 권한(Authorization) 검증 기초 뼈대를 구축했습니다.
+
+#### 📄 1. 신규 추가 및 변경된 파일 내역
+* **`[추가]` UserRole.java (Enum):** * 사용자의 권한을 명확히 구분하기 위해 `USER("ROLE_USER")`, `ADMIN("ROLE_ADMIN")` 두 가지 상태를 정의했습니다.
+* **`[수정]` User.java (Entity):** * DB 테이블에 권한을 저장할 `role` 필드를 추가하고, String 형태로 저장되도록 `@Enumerated(EnumType.STRING)`을 적용했습니다.
+* **`[수정]` UserService.java:** * 회원가입 시 기본적으로 `USER` 권한을 부여하도록 로직을 수정했습니다. (단, 개발 테스트를 위해 `admin` 아이디로 가입 시 `ADMIN` 권한을 부여하는 임시 백도어 적용)
+* **`[수정]` JwtUtil.java & UserController.java:** * 로그인 완료 후 JWT 토큰을 발급할 때, Payload 내부에 해당 유저의 권한(Role) 정보를 함께 암호화하여 담도록 수정했습니다.
+* **`[수정]` JwtAuthenticationFilter.java:** * 클라이언트가 API를 요청할 때 전달한 토큰에서 Role 정보를 추출하여, Spring Security의 `Authentication` 객체에 실제 권한(`SimpleGrantedAuthority`)으로 주입하도록 필터 단을 보완했습니다.
+
+---
+
+#### 🚨 2. 현재 코드의 문제점 (Known Issue) 및 향후 개선 과제
+
+**[문제점] 개발용 임시 백도어(Backdoor)로 인한 보안 취약점**
+현재 `UserService`의 회원가입 로직에는 원활한 관리자 기능 테스트를 위해 아래와 같은 하드코딩된 조건문이 삽입되어 있습니다.
+```java
+if (username.equals("admin")) {
+    role = UserRole.ADMIN;
+}
+```
+이는 누구나 admin이라는 아이디로 가입하기만 하면 즉시 최고 관리자 권한을 획득할 수 있는 치명적인 보안 헛점입니다. 실제 상용 서비스에 배포될 경우 악의적인 공격자에 의해 시스템 전체가 제어될 위험이 있습니다.
+
+[해결 방안 및 Next Step]
+이러한 기술 부채(Tech Debt)를 해결하기 위해, 최종 배포(프로덕션) 전까지 다음 단계 중 하나로 로직을 개선할 예정입니다.
+
+임시 로직 삭제: 해당 if문을 완전히 제거하여 일반 가입 경로로는 절대 ADMIN 권한을 얻을 수 없도록 원천 차단합니다.
+
+초기 관리자 주입: 서비스 런칭 시 DB 초기화 스크립트(data.sql 등)를 통해 매우 복잡한 패스워드를 가진 '최초 슈퍼 관리자' 계정을 단 1개만 수동으로 생성합니다.
+
+권한 승급 기능: 최초 관리자가 사내 시스템에 로그인하여 일반 유저의 권한을 관리자(ADMIN)로 변경해 주는 별도의 승급 API를 개발합니다.
+
+
