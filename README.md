@@ -1442,3 +1442,64 @@ if (username.equals("admin")) {
 **💡 API 명세서(Swagger)가 업데이트되었으니 프론트엔드 팀원분들은 확인 부탁드립니다!**
 기술 부채와 관련된 리팩토링 의견은 언제든 환영합니다. 고생하셨습니다!
 ```
+
+## 프로젝트 구조 
+
+```
+🧊 냉부해 (Naengbuhae) 프로젝트 전체 구조도
+
+  📦 Naengbuhae (스마트 냉장고 관리 백엔드)
+  ┣ 📂 src/main/java/com/example/Naengbuhae
+  ┃ ┣ 📂 config        # 🛡️ 문지기 & 도구함: CORS, JWT, 시큐리티 등 보안 설정
+  ┃ ┃ ┣ 📜 CorsConfig.java
+  ┃ ┃ ┣ 📜 JwtAuthenticationFilter.java
+  ┃ ┃ ┣ 📜 JwtUtil.java
+  ┃ ┃ ┣ 📜 SecurityConfig.java
+  ┃ ┃ ┗ 📜 SwaggerConfig.java
+  ┃ ┣ 📂 controller    # 🛎️ 안내데스크: 프론트엔드의 요청을 받는 API 창구 (식재료/레시피)
+  ┃ ┃ ┣ 📜 IngredientController.java
+  ┃ ┃ ┗ 📜 RecipeController.java
+  ┃ ┣ 📂 domain        # 🗄️ 데이터 설계도: DB 테이블과 매핑되는 핵심 엔티티
+  ┃ ┃ ┣ 📜 Ingredient.java
+  ┃ ┃ ┗ 📜 Recipe.java
+  ┃ ┣ 📂 dto           # 🚚 택배 상자: 계층 간 데이터를 실어 나르는 전송 객체
+  ┃ ┃ ┣ 📜 IngredientRequestDto.java
+  ┃ ┃ ┣ 📜 IngredientResponseDto.java
+  ┃ ┃ ┣ 📜 RecipeRequestDto.java
+  ┃ ┃ ┣ 📜 RecipeResponseDto.java
+  ┃ ┃ ┗ 📜 SystemStatsResponseDto.java (🆕 관리자 통계용 택배 상자)
+  ┃ ┣ 📂 exception     # 🚑 응급실: 서버에서 발생하는 모든 에러를 낚아채서 치료
+  ┃ ┃ ┗ 📜 GlobalExceptionHandler.java
+  ┃ ┣ 📂 repository    # 📦 창고 관리자: DB에 데이터를 넣고 빼는 일꾼들
+  ┃ ┃ ┣ 📜 IngredientRepository.java
+  ┃ ┃ ┗ 📜 RecipeRepository.java
+  ┃ ┣ 📂 service       # ⚙️ 공장 생산라인: 핵심 비즈니스 로직이 돌아가는 곳
+  ┃ ┃ ┣ 📜 IngredientService.java
+  ┃ ┃ ┗ 📜 RecipeService.java
+  ┃ ┗ 📂 user          # 👤 회원 전용 라운지: 사용자 가입, 로그인 및 관리자(Admin) 전용 구역
+  ┃ ┃ ┣ 📜 AdminController.java (🆕 관리자 전용 마스터 키)
+  ┃ ┃ ┣ 📜 ApiResponse.java
+  ┃ ┃ ┣ 📜 LoginRequest.java
+  ┃ ┃ ┣ 📜 LoginResponse.java
+  ┃ ┃ ┣ 📜 SignupRequest.java
+  ┃ ┃ ┣ 📜 User.java
+  ┃ ┃ ┣ 📜 UserController.java
+  ┃ ┃ ┣ 📜 UserRepository.java
+  ┃ ┃ ┣ 📜 UserResponseDto.java (🆕 유저 정보 보호용 택배 상자)
+  ┃ ┃ ┣ 📜 UserRole.java        (🆕 계급장: USER vs ADMIN)
+  ┃ ┃ ┗ 📜 UserService.java
+  ┣ 📂 src/main/resources
+  ┃ ┣ 📜 application.properties  # ⚙️ 앱 핵심 설정: DB 주소 및 스프링 설정
+  ┃ ┣ 📂 static                 # 🖼️ 정적 보관소: 이미지, CSS 등
+  ┃ ┗ 📂 templates              # 📄 템플릿 창고: HTML 화면 파일들
+  ┣ 📜 .env                # 🤫 1급 비밀: JWT 시크릿 키 등 민감 정보 (공유 엄금!)
+  ┣ 📜 build.gradle        # 🐘 부품 주문서: 프로젝트에 필요한 라이브러리 목록
+  ┣ 📜 settings.gradle      # 📝 프로젝트 이름표: 프로젝트 설정 정보
+  🔍 구조적 특이사항 (Audit 결과 반영)
+   1. 도메인 분리: 사용자 관련 기능(user)은 하나의 패키지에 모여 있는 도메인형 구조를 띠고 있으며, 그 외 기능들은 계층형
+      구조(controller, service 등)로 관리되고 있습니다.
+   2. 보안 강화: 최근 추가된 AdminController와 UserRole 등을 통해 일반 사용자와 관리자의 영역이 엄격히 분리되었습니다.
+   3. 데이터 무결성: GlobalExceptionHandler를 통해 서버 내 예외 상황을 통합 관리하고 있습니다.
+```
+
+
