@@ -1353,3 +1353,21 @@ if (username.equals("admin")) {
 
 <img width="1397" height="475" alt="image" src="https://github.com/user-attachments/assets/0b1c8801-9100-472e-8ccb-684f80035547" />
 
+
+### 📊 [기능 구현] 관리자 전용 시스템 통계 대시보드 API
+
+서비스의 전반적인 활성도를 한눈에 파악하고 운영 지표로 활용하기 위해, 전체 시스템의 주요 데이터 개수를 통합하여 제공하는 **통계 대시보드 API**를 구현했습니다.
+
+#### 📄 1. 주요 구현 사항
+* **`SystemStatsResponseDto.java`:** 총 사용자 수(`totalUsers`), 총 레시피 수(`totalRecipes`), 총 식재료 수(`totalIngredients`)를 한 번에 담아 반환하는 통계 전용 DTO를 설계했습니다.
+* **Service 계층 확장:** `UserService`, `RecipeService`, `IngredientService`에 각각 데이터 집계를 위한 `count` 메서드를 추가했습니다.
+* **`AdminController.java`:** `GET /admin/stats` 엔드포인트를 신설하여, 각 서비스의 집계 결과를 하나의 DTO로 조립하여 반환하도록 구성했습니다.
+
+#### 🛠️ 2. 성능 및 보안 최적화
+* **쿼리 성능 최적화:** 전체 데이터를 메모리에 로드하여 개수를 세는 방식(`List.size()`)을 지양하고, JPA Repository의 `count()` 메서드를 활용해 DB 레벨에서 `SELECT COUNT(*)` 쿼리가 실행되도록 하여 대용량 데이터 환경에서도 성능 저하가 없도록 최적화했습니다.
+* **엔드포인트 보안:** `@PreAuthorize("hasRole('ADMIN')")`를 통해 관리자 권한을 가진 유저만 시스템 통계에 접근할 수 있도록 보안을 유지했습니다.
+
+<img width="1419" height="239" alt="image" src="https://github.com/user-attachments/assets/ca694757-d7b1-4206-b230-d5ca46b73429" />
+
+<img width="1417" height="401" alt="image" src="https://github.com/user-attachments/assets/1b6091e7-b638-4b99-989e-91ce58524c9d" />
+
