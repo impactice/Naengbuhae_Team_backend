@@ -1371,3 +1371,74 @@ if (username.equals("admin")) {
 
 <img width="1417" height="401" alt="image" src="https://github.com/user-attachments/assets/1b6091e7-b638-4b99-989e-91ce58524c9d" />
 
+## 관리자 기능 정리
+```
+# 🚀 [백엔드 공유사항] 관리자(Admin) 권한 시스템 및 전용 API 구현 완료
+
+안녕하세요! 우리 '냉부해' 프로젝트의 운영 효율성과 보안을 담당할 **관리자(Admin) 권한 제어 및 모니터링 API**의 기초 공사를 완료하여 공유해 드립니다. 
+
+프론트엔드 팀원분들이 스웨거(Swagger)에서 바로 테스트하실 수 있도록 `SecurityConfig` 및 권한 세팅도 최적화해 두었습니다.
+
+---
+
+### 1️⃣ 새롭게 구현된 주요 기능
+
+1. **스프링 시큐리티 기반 RBAC (Role-Based Access Control)**
+   - `USER`와 `ADMIN` 권한을 명확히 분리했습니다.
+   - `@EnableMethodSecurity`를 활성화하여 컨트롤러 메서드 단위에서 `@PreAuthorize("hasRole('ADMIN')")`로 접근을 철저하게 제어합니다.
+
+2. **시스템 대시보드 통계 (`GET /admin/stats`)**
+   - 관리자 메인 화면용 API입니다. 총 유저 수, 총 레시피 수, 총 식재료 수를 반환합니다.
+   - **최적화:** 대용량 데이터를 고려해 메모리에 로드하지 않고, Repository의 `count()` 메서드를 사용하여 DB 레벨에서 집계하도록 구현했습니다.
+
+3. **전체 유저 목록 조회 (`GET /admin/users`)**
+   - 관리자가 서비스 유저 현황을 파악할 수 있습니다.
+   - 비밀번호 등 민감 정보 유출 방지를 위해 전용 DTO(`UserResponseDto`)를 통해 안전하게 반환합니다.
+
+4. **부적절한 레시피 강제 삭제 (`DELETE /admin/recipes/{recipeId}`)**
+   - 운영 정책 위반 콘텐츠를 즉시 조치하기 위한 API입니다.
+   - 일반 유저의 '본인 확인' 로직을 우회하여 관리자 권한으로 즉시 삭제가 가능한 전용 로직을 `RecipeService`에 별도로 구축했습니다.
+
+5. **전체 레시피 모니터링 (`GET /admin/recipes`)**
+   - 작성자 본인 여부와 관계없이 시스템의 모든 레시피를 조회합니다.
+   - 관리 편의를 위해 `RecipeResponseDto`에 작성자(`username`) 필드를 추가했습니다.
+
+---
+
+### 2️⃣ 신규 추가 및 변경된 파일 목록
+
+#### 📂 Controller
+- `AdminController.java` (**신규**): 관리자 전용 엔드포인트 격리 및 관리
+- `UserController.java` (**수정**): 매핑 주소 누락분 복구 및 경로 최적화
+
+#### 📂 Service
+- `UserService.java`, `RecipeService.java`, `IngredientService.java` (**수정**): 관리자 전용 삭제 로직 및 고성능 `count()` 기반 집계 로직 추가
+
+#### 📂 DTO
+- `SystemStatsResponseDto.java`, `UserResponseDto.java` (**신규 생성**)
+- `RecipeResponseDto.java` (**수정**): 작성자 정보 확인을 위한 `username` 필드 추가
+
+#### 📂 Config / Security
+- `SecurityConfig.java` (**수정**): 인가 예외 경로(`permitAll()`) 재설정 및 메서드 단위 보안 활성화
+- `UserRole.java` (Enum): 권한 명세 체계 정립
+
+---
+
+### 3️⃣ ⚠️ 현재 안고 있는 문제점 및 기술 부채 (논의 필요)
+
+기능은 정상 작동하나, 실제 배포 및 운영을 위해 해결해야 할 **3가지 주요 기술 부채**가 있습니다. 다음 회의 때 리팩토링 방향을 같이 정했으면 합니다.
+
+1. **관리자 계정 생성 로직 임시화 (보안 백도어)**
+   - 현재 테스트 편의를 위해 회원가입 시 `username`이 `"admin"`이면 자동으로 `ADMIN` 권한을 부여하고 있습니다. 배포 전 이 로직을 제거하고, DB 초기화 스크립트나 별도의 승급 시스템을 도입해야 합니다.
+
+2. **데이터 물리 삭제(Hard Delete)의 위험성**
+   - 현재 삭제 API는 DB에서 데이터를 영구 제거합니다. 오삭제 복구 및 증거 보존을 위해 삭제 여부(`is_deleted`) 플래그만 변경하는 **논리 삭제(Soft Delete)** 도입 검토가 필요합니다.
+
+3. **감사 로그(Audit Log) 부재**
+   - 관리자가 특정 데이터를 삭제/수정했을 때 "누가, 언제, 왜" 했는지에 대한 기록이 남지 않습니다. 운영 안전성을 위해 로그 기록용 엔티티 추가를 제안합니다.
+
+---
+
+**💡 API 명세서(Swagger)가 업데이트되었으니 프론트엔드 팀원분들은 확인 부탁드립니다!**
+기술 부채와 관련된 리팩토링 의견은 언제든 환영합니다. 고생하셨습니다!
+```
