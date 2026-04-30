@@ -1527,3 +1527,24 @@ if (username.equals("admin")) {
 <img width="1406" height="421" alt="image" src="https://github.com/user-attachments/assets/8e45a946-f592-475b-b92b-f6b972630721" />
 
 
+## 🚀 [성능 최적화] N+1 쿼리 문제 해결 및 API 응답 속도 개선
+
+관리자(Admin) 전용 전체 레시피 조회 API에서 발생하던 심각한 데이터베이스 병목 현상을 파악하고, 쿼리 최적화를 통해 서버 성능을 비약적으로 향상시켰습니다.
+
+### 1. 🔍 도입 배경 및 문제 상황 (N+1 Query)
+* **기존 문제:** `Recipe`와 작성자(`User`) 엔티티가 지연 로딩(Lazy Loading)으로 매핑되어 있어, 전체 레시피를 조회할 때 작성자 정보를 가져오기 위해 **레시피 개수(N)만큼의 추가 SELECT 쿼리**가 발생하는 'N+1 문제'가 존재했습니다.
+* **성능 저하:** 레시피가 100개일 경우 총 101번의 쿼리가 실행되어 네트워크 오버헤드 및 DB 커넥션 고갈 위험이 컸습니다.
+
+### 2. 🛠️ 해결 방안 (JOIN FETCH 적용)
+* `RecipeRepository`에 커스텀 쿼리 메서드(`findAllWithUser()`)를 생성했습니다.
+* `@Query("SELECT r FROM Recipe r JOIN FETCH r.user")` 구문을 적용하여, SQL 수준에서 `INNER JOIN`을 통해 레시피와 유저 데이터를 한 번에 즉시 로딩(Eager Fetch)하도록 강제했습니다.
+* `RecipeService`의 관리자 조회 로직을 기존 `findAll()`에서 최적화된 메서드로 교체했습니다.
+
+### 3. 🎯 최적화 결과 (Performance Impact)
+* **쿼리 호출 횟수 감소:** 101번 실행되던 쿼리가 **단 1번의 쿼리**로 드라마틱하게 단축되었습니다.
+* **응답 속도 개선:** 데이터베이스 I/O 병목이 해소되어, 대량의 데이터 조회 시에도 지연 없는 빠른 대시보드 로딩 속도를 확보했습니다.
+
+
+
+
+
