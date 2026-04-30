@@ -1606,7 +1606,7 @@ if (username.equals("admin")) {
 ### 5. 빌드 환경 안정화 및 API 문서화 (Build & Docs)
 - 프론트엔드 및 타 서비스와의 원활한 협업(API 연동)을 위해 `springdoc-openapi`를 적용하여 **Swagger UI**를 구축 및 복구하였으며, 안정적인 의존성 관리를 위해 Spring Boot 환경을 `3.2.4` 최적화 버전으로 동기화했습니다.
 
-
+## build.gradle 해결한 방법
 
 build.gradle 버전을 안정화 버전으로 할려고 했으나 에러가 뜸 
 <img width="1919" height="1008" alt="image" src="https://github.com/user-attachments/assets/ed62083c-520e-46cd-8a1d-fa100b13ac4b" />
