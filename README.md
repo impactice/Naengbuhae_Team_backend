@@ -1502,4 +1502,28 @@ if (username.equals("admin")) {
    3. 데이터 무결성: GlobalExceptionHandler를 통해 서버 내 예외 상황을 통합 관리하고 있습니다.
 ```
 
+### 🛡️ [안정성 강화] 레시피 데이터 유효성 검사 (API Validation) 적용
+
+프론트엔드 연동 및 실서비스 운영 시 발생할 수 있는 데이터 무결성 결함을 방지하고, 서버의 비정상 종료(500 Error)를 원천 차단하기 위해 **강력한 유효성 검사 방패**를 구축했습니다.
+
+#### 1. 🔍 도입 배경 및 문제 해결
+* **기존 문제:** 레시피 등록/수정 시 필수 데이터(제목, 조리법 등)가 누락된 채 들어오면 DB 제약 조건과 충돌하여 서버가 500 에러를 뱉으며 멈추는 현상 발생.
+* **해결 방안:** 계층 간 데이터 전송 객체(DTO)에서 1차 검증을 수행하고, 컨트롤러 진입 전 문지기(`@Valid`)를 세워 부적절한 요청을 즉각 차단함.
+
+#### 2. 🛠️ 주요 적용 사항
+* **`RecipeRequestDto` 내 제약 조건 설정:**
+  - `title`: `@NotBlank` (공백/Null 허용 안 함)
+  - `instructions`: `@NotBlank` (조리 방법 필수 입력)
+  - `cookingTime`: `@NotNull` 및 `@Min(1)` (최소 1분 이상의 숫자만 허용)
+* **`RecipeController` 보호:**
+  - `POST /recipes`, `PUT /recipes/{id}` 메서드에 `@Valid` 어노테이션을 적용하여 실시간 검증 활성화.
+
+#### 3. 🎯 검증 결과 (Safety Check)
+* **HTTP 400 Bad Request 반환:** 잘못된 데이터 유입 시 서버가 다운되지 않고, 사용자에게 구체적인 에러 메시지를 JSON 형태로 안전하게 반환함을 확인했습니다.
+* **에러 메시지 예시:** `"레시피 제목은 필수 입력 항목입니다."`, `"조리 시간은 최소 1분 이상이어야 합니다."`
+
+<img width="1456" height="620" alt="image" src="https://github.com/user-attachments/assets/5dfe2420-bf27-42e0-bb58-a8042c6e08ee" />
+
+<img width="1406" height="421" alt="image" src="https://github.com/user-attachments/assets/8e45a946-f592-475b-b92b-f6b972630721" />
+
 
