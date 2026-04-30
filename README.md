@@ -1579,3 +1579,55 @@ if (username.equals("admin")) {
 
 ### 4. JWT 토큰 생명주기 최적화 (Stateless Security)
 - 탈취된 토큰의 악용 가능성(Replay Attack 등)을 최소화하기 위해, `JwtUtil`의 Access Token 만료 시간을 기존 1시간에서 **30분으로 단축**하여 보안을 한층 강화했습니다.
+
+------------------------
+## 🛡️ 시스템 아키텍처 및 보안 (Security & Architecture)
+
+본 프로젝트의 백엔드는 실서비스 트래픽과 대규모 유입 상황을 고려하여, 철저한 계층 간 책임 분리(Layered Architecture)와 다중 보안 방어막을 적용해 견고하게 구축되었습니다.
+
+### 1. 전역 예외 처리 및 API 규격화 (Global Exception Handling)
+- **문제:** 예외 상황(검증 실패, DB 중복 등)에서도 `200 OK`를 반환할 경우 프론트엔드 연동 시 에러 핸들링이 꼬이는 문제가 발생할 수 있습니다.
+- **해결:** `@RestControllerAdvice` 기반의 `GlobalExceptionHandler`를 도입했습니다. 
+- **효과:** 유효성 검증 실패 시 `400 Bad Request`, DB 제약조건 위반 시 `409 Conflict` 등 명확한 HTTP 상태 코드와 함께 규격화된 JSON(`ApiResponse`) 응답을 프론트엔드에 전달하여 통신 신뢰성을 확보했습니다.
+
+### 2. DTO 기반 1차 방어막 (Validation Flow)
+- **적용:** 서비스 레이어에 산재된 복잡한 값 검증 로직을 걷어내고, `SignupRequest(DTO)` 객체에 `jakarta.validation` 제약조건(`@NotBlank`, `@Email`, `@Pattern` 등)을 촘촘하게 선언했습니다.
+- **효과:** `UserController` 입구에서 `@Valid` 어노테이션을 통해 불량 데이터를 즉시 차단(입구컷)함으로써, 불필요한 트랜잭션 소모를 막고 `UserService`가 핵심 비즈니스 로직에만 집중하도록 응집도를 높였습니다.
+
+### 3. 동시성 제어 및 트랜잭션 보장 (Concurrency & Transaction)
+- **문제:** 찰나의 순간에 동일 아이디로 동시 가입 요청이 들어오는 경쟁 상태(Race Condition) 시 DB 정합성이 깨질 위험이 존재했습니다.
+- **해결:** `UserService`의 데이터 변경 로직에 `@Transactional`을 명시적으로 적용하여 작업의 원자성(Atomicity)을 보장하고, 예기치 못한 에러 발생 시 안전하게 롤백(Rollback)되도록 설계했습니다.
+
+### 4. 무결점 권한 제어 및 Audit 로깅 (Security & Audit)
+- **관리자 백도어 원천 차단:** 회원가입 시 모든 신규 유저에게 시스템 단에서 `UserRole.USER` 권한을 강제 하드코딩으로 할당하여, 외부 조작을 통한 관리자 권한 탈취를 100% 방어했습니다.
+- **관리자 행위 추적 (Audit Log):** `AdminController`의 주요 데이터 강제 삭제 API 호출 시, `SecurityContextHolder`를 통해 인가된 관리자의 ID를 추출하고 `@Slf4j` `WARN` 레벨로 영구 기록하는 감사 로그(Audit Logging) 시스템을 구축했습니다.
+- **JWT 생명주기 최적화:** 토큰 탈취(Replay Attack) 피해를 최소화하기 위해 Access Token의 유효 기간을 30분으로 단축하여 Stateless 보안 환경을 한층 강화했습니다.
+
+### 5. 빌드 환경 안정화 및 API 문서화 (Build & Docs)
+- 프론트엔드 및 타 서비스와의 원활한 협업(API 연동)을 위해 `springdoc-openapi`를 적용하여 **Swagger UI**를 구축 및 복구하였으며, 안정적인 의존성 관리를 위해 Spring Boot 환경을 `3.2.4` 최적화 버전으로 동기화했습니다.
+
+
+
+build.gradle 버전을 안정화 버전으로 할려고 했으나 에러가 뜸 
+<img width="1919" height="1008" alt="image" src="https://github.com/user-attachments/assets/ed62083c-520e-46cd-8a1d-fa100b13ac4b" />
+
+여기로 들어감 
+<img width="428" height="141" alt="image" src="https://github.com/user-attachments/assets/28dfa0d3-4be2-4df8-a942-5ad52002dd90" />
+
+이런 코드였는데 
+<img width="1316" height="566" alt="image" src="https://github.com/user-attachments/assets/06a4fff1-7af5-49ea-8d01-b62f86d0187c" />
+
+이렇게 바꿈
+<img width="1327" height="562" alt="image" src="https://github.com/user-attachments/assets/cc2e0c26-adde-49d1-9105-168c9e8d7b4b" />
+
+그리고 코끼리 모양 클릭해주니 이렇게 됨
+<img width="1919" height="1008" alt="image" src="https://github.com/user-attachments/assets/2e90a760-5a15-4465-aa9d-3f6eaa884e81" />
+
+
+
+
+
+
+
+
+
