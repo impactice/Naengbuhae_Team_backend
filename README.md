@@ -1684,3 +1684,37 @@ delete
 <img width="1430" height="619" alt="image" src="https://github.com/user-attachments/assets/ea4d2025-9ee2-4c73-8b6e-17d1997693a7" />
 
 <img width="1419" height="418" alt="image" src="https://github.com/user-attachments/assets/07aed3db-0731-432b-ab03-61aa88271416" />
+
+### 4. 장보기 리스트 -> 냉장고 마법의 이관 API
+- **개요:** 장보기가 끝난 후, 체크된 항목들을 내 냉장고로 한 번에 옮겨주는 핵심 자동화 로직입니다.
+- **주요 기능:**
+  - `checked=true` 상태인 장보기 항목만 필터링하여 `Ingredient` 엔티티로 자동 변환합니다. (소수점 수량은 정수로 안전하게 내림/변환 처리)
+  - 구매일(오늘), 유통기한(오늘+7일), 카테고리(미분류), 보관상태(냉장) 등 필수 기본값을 자동으로 할당하여 무결성을 유지하며 DB에 저장합니다.
+  - 냉장고 이관이 완료된 데이터는 `ShoppingItem` 테이블에서 일괄 삭제되어 깔끔한 상태를 유지합니다.
+
+api/shopping-list/{id}/toggle (PATCH)
+<img width="1415" height="622" alt="image" src="https://github.com/user-attachments/assets/aabe9ccb-e80f-4497-b245-8eed0baf3e24" />
+
+<img width="1414" height="452" alt="image" src="https://github.com/user-attachments/assets/5108bec7-89b8-428b-9c89-e02770a111f6" />
+
+/api/shopping-list/move-to-fridge (POST)
+<img width="1414" height="522" alt="image" src="https://github.com/user-attachments/assets/eacaa603-2241-4683-b9b4-c5ad63ce8b9c" />
+
+<img width="1420" height="412" alt="image" src="https://github.com/user-attachments/assets/586ca06b-c24d-42f3-94ed-be5decaa89d5" />
+
+/api/shopping-list (GET)
+
+<img width="1420" height="516" alt="image" src="https://github.com/user-attachments/assets/52698106-978f-43e4-815f-33cd54bf5960" />
+
+<img width="1416" height="467" alt="image" src="https://github.com/user-attachments/assets/a6a46304-c936-40a1-9350-e9760c3ea2be" />
+
+
+/api/ingredients (GET)
+<img width="1416" height="512" alt="image" src="https://github.com/user-attachments/assets/7602e9a4-b869-4a58-8804-1475279b52f6" />
+
+<img width="1416" height="515" alt="image" src="https://github.com/user-attachments/assets/0e74790e-20a5-444d-a82f-295ccd230bc4" />
+
+### 5. 글로벌 예외 처리 (Global Exception Handling) 고도화
+- **JSON 파싱 에러 완벽 방어 (`HttpMessageNotReadableException`):** 
+  - 프론트엔드에서 날짜 형식(`yyyy-MM-dd`)에 슬래시(`/`)를 섞어 보내거나, 숫자 필드에 문자를 넣는 등 잘못된 타입의 데이터를 전송했을 때 발생하는 파싱 에러를 원천 차단합니다.
+  - 서버가 다운되거나 알아보기 힘든 기본 에러를 뱉는 대신, 프로젝트 표준 규격인 `ApiResponse` (400 Bad Request) 형태로 젠틀하게 예외 메시지를 반환하여 프론트엔드와의 협업 안정성을 극대화했습니다.
