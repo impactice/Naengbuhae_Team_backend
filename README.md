@@ -1606,6 +1606,11 @@ if (username.equals("admin")) {
 ### 5. 빌드 환경 안정화 및 API 문서화 (Build & Docs)
 - 프론트엔드 및 타 서비스와의 원활한 협업(API 연동)을 위해 `springdoc-openapi`를 적용하여 **Swagger UI**를 구축 및 복구하였으며, 안정적인 의존성 관리를 위해 Spring Boot 환경을 `3.2.4` 최적화 버전으로 동기화했습니다.
 
+### 6. 무중단 프론트엔드 연동 (CORS & Pre-flight 최적화)
+- **문제:** 브라우저의 사전 요청(Pre-flight)인 `OPTIONS` 메서드가 Spring Security 필터에서 인증 거부되어 프론트엔드 단에서 억울한 CORS 에러가 발생하는 고질적인 통신 문제.
+- **해결:** 파편화되어 있던 CORS 설정을 `SecurityConfig` 내부로 완벽하게 통합하여 설정 충돌을 방지했습니다. 또한 시큐리티 인가 목록에 `HttpMethod.OPTIONS`를 전면 허용(`permitAll()`)하여 토큰이 없는 사전 노크 요청이 안전하게 통과되도록 아키텍처를 수정했습니다.
+- **효과:** 프론트엔드 로컬 개발 환경(`localhost`, `127.0.0.1`)에서 발생하는 교차 출처 리소스 에러를 원천 차단하여, 타 파트와의 협업 병목 현상과 디버깅 시간을 대폭 감소시켰습니다.
+
 ## build.gradle 해결한 방법
 
 build.gradle 버전을 안정화 버전으로 할려고 했으나 에러가 뜸 
