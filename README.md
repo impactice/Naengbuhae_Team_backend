@@ -1718,3 +1718,10 @@ api/shopping-list/{id}/toggle (PATCH)
 - **JSON 파싱 에러 완벽 방어 (`HttpMessageNotReadableException`):** 
   - 프론트엔드에서 날짜 형식(`yyyy-MM-dd`)에 슬래시(`/`)를 섞어 보내거나, 숫자 필드에 문자를 넣는 등 잘못된 타입의 데이터를 전송했을 때 발생하는 파싱 에러를 원천 차단합니다.
   - 서버가 다운되거나 알아보기 힘든 기본 에러를 뱉는 대신, 프로젝트 표준 규격인 `ApiResponse` (400 Bad Request) 형태로 젠틀하게 예외 메시지를 반환하여 프론트엔드와의 협업 안정성을 극대화했습니다.
+
+## 🛠 트러블슈팅: 식재료 이관 시 소수점 수량 유실(Truncation) 버그 해결
+* **이슈:** 장바구니에서는 수량을 소수점(`Double`)으로 관리하나(예: 대파 1.5단), 냉장고 식재료는 정수(`Integer`)로 관리되어, 장바구니에서 냉장고로 항목을 이관할 때 소수점이 증발하는 데이터 불일치 현상 발생[cite: 46].
+* **해결 로직:**
+  * `Ingredient` 엔티티 및 관련 입출력 DTO(`IngredientRequestDto`, `IngredientResponseDto`)의 `quantity` 데이터 타입을 모두 `Double`로 통일하여 장바구니와 규약 일치[cite: 43, 44, 45].
+  * API 요청 시 `@Positive` 어노테이션을 적용하여 0.5 같은 소수점 단위의 입력 유효성 검사 완벽 지원[cite: 44].
+  * 장바구니 ➡️ 냉장고 이관 비즈니스 로직(`ShoppingItemService`) 내에 존재하던 강제 형변환(`intValue()`)을 제거하여 데이터 정합성 100% 확보[cite: 46].
