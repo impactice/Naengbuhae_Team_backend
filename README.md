@@ -1643,8 +1643,49 @@ build.gradle 버전을 안정화 버전으로 할려고 했으나 에러가 뜸
   - 관심사 분리(SoC) 원칙에 따라 계산 로직을 `CalorieCalculator` 유틸리티 클래스로 완전히 격리했습니다.
   - 이로 인해 `UserService`는 복잡한 수학 공식 없이 도메인 흐름 제어와 트랜잭션 관리에만 집중할 수 있도록 응집도를 높였습니다.
 
+### 2. 식재료 관리 (Ingredient) 도메인 - 완벽한 방어적 프로그래밍 적용
+- **개요:** 사용자가 자신의 냉장고에 보관 중인 식재료를 등록, 조회, 수정, 삭제(CRUD)할 수 있는 핵심 API입니다.
+- **보안 및 인가 (IDOR 방어):** 
+  - `Controller` 계층에서 Spring Security의 `Principal` 객체를 활용해 안전하게 유저 식별자를 추출합니다.
+  - `Service` 계층의 모든 수정/삭제 로직에서 `!ingredient.getUser().getUsername().equals(username)` 검증을 거쳐, 타인의 식재료를 조작할 수 없도록 완벽한 소유권(Ownership) 체크를 구현했습니다.
+- **데이터 무결성 극대화 (@Valid):** 
+  - 프론트엔드의 비정상적인 요청을 차단하기 위해 `IngredientRequestDto`에 철벽 방어막을 구축했습니다.
+  - `@Min(1)`로 음수 수량 방지, `@FutureOrPresent`로 과거 유통기한 등록 차단, `@JsonFormat`으로 날짜 파싱 오류 방어, 그리고 정규식(`@Pattern(regexp = "^(냉장|냉동|실온)$")`)을 통해 데이터베이스에 들어가는 보관 방법 데이터의 정합성을 소프트웨어 레벨에서 2중으로 보호합니다.
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+post
+<img width="1491" height="726" alt="image" src="https://github.com/user-attachments/assets/3e9814c9-3242-41c2-b0b1-ed84c6e0e06a" />
+
+<img width="1411" height="453" alt="image" src="https://github.com/user-attachments/assets/7abd3ee4-28cc-40ce-93b5-1d28d0332969" />
+
+<img width="1299" height="141" alt="image" src="https://github.com/user-attachments/assets/203273fb-b880-4842-8c7c-c2e58427e185" />
+
+
+get 
+<img width="1461" height="564" alt="image" src="https://github.com/user-attachments/assets/2644d7f2-aa91-40e5-9e0d-87986d197c09" />
+
+<img width="1411" height="472" alt="image" src="https://github.com/user-attachments/assets/845bb54e-f4ad-4c50-8f0b-8fdc23470d9d" />
+
+patch
+<img width="1414" height="608" alt="image" src="https://github.com/user-attachments/assets/18770a86-af0e-4008-af99-ce8a352277fd" />
+
+<img width="1410" height="442" alt="image" src="https://github.com/user-attachments/assets/af4f4e95-4efe-4eeb-92c8-b6e71d7dbbe5" />
+
+delete
+<img width="1430" height="619" alt="image" src="https://github.com/user-attachments/assets/ea4d2025-9ee2-4c73-8b6e-17d1997693a7" />
+
+<img width="1419" height="418" alt="image" src="https://github.com/user-attachments/assets/07aed3db-0731-432b-ab03-61aa88271416" />
