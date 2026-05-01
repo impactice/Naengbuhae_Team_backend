@@ -1653,19 +1653,14 @@ build.gradle 버전을 안정화 버전으로 할려고 했으나 에러가 뜸
   - `@Min(1)`로 음수 수량 방지, `@FutureOrPresent`로 과거 유통기한 등록 차단, `@JsonFormat`으로 날짜 파싱 오류 방어, 그리고 정규식(`@Pattern(regexp = "^(냉장|냉동|실온)$")`)을 통해 데이터베이스에 들어가는 보관 방법 데이터의 정합성을 소프트웨어 레벨에서 2중으로 보호합니다.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 3. 장보기 리스트 (Shopping List) - 심플 & 스피드 지향
+- **개요:** 마트에서 한 손으로 빠르게 체크할 수 있도록 '이름, 수량, 단위' 위주의 간편 메모형 장보기 CRUD API를 구현했습니다.
+- **주요 기능:**
+  - 장보기 항목 추가, 내 장보기 전체 조회, 삭제 기능 (POST, GET, DELETE)
+  - 장바구니 담기(구매 완료) 체크 상태 토글 기능 (PATCH 적용으로 RESTful 설계 준수)
+- **보안 및 안정성:**
+  - 식재료/레시피 도메인과 동일하게 `Principal`을 이용한 완벽한 소유권(Ownership) 방어 적용.
+  - DTO 계층에서 수량(`quantity`) 양수 검증 등 `@Valid`를 통한 무결성 100% 보장.
 
 post
 <img width="1491" height="726" alt="image" src="https://github.com/user-attachments/assets/3e9814c9-3242-41c2-b0b1-ed84c6e0e06a" />
