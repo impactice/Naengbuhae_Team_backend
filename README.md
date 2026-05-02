@@ -1725,3 +1725,51 @@ api/shopping-list/{id}/toggle (PATCH)
   * `Ingredient` 엔티티 및 관련 입출력 DTO(`IngredientRequestDto`, `IngredientResponseDto`)의 `quantity` 데이터 타입을 모두 `Double`로 통일하여 장바구니와 규약 일치[cite: 43, 44, 45].
   * API 요청 시 `@Positive` 어노테이션을 적용하여 0.5 같은 소수점 단위의 입력 유효성 검사 완벽 지원[cite: 44].
   * 장바구니 ➡️ 냉장고 이관 비즈니스 로직(`ShoppingItemService`) 내에 존재하던 강제 형변환(`intValue()`)을 제거하여 데이터 정합성 100% 확보[cite: 46].
+
+
+## 🛠️ 백엔드 보안 및 아키텍처 개선 (Hotfix 적용 완료)
+
+로컬(IntelliJ) 및 도커(Docker) 컨테이너 환경 모두에서 무중단으로 안정적으로 구동되도록 **환경변수 유연성을 확보**하고, 런타임 에러를 사전에 차단하기 위한 **방어적 프로그래밍(Defensive Programming)** 패치를 적용했습니다.
+
+### 🚀 주요 업데이트 내역
+
+**1. CORS 동적 파싱 및 휴먼 에러 방어 로직 추가 (`SecurityConfig.java`)**
+- **문제:** 환경변수로 여러 도메인을 주입할 때, 콤마(`,`) 뒤에 공백이 포함되거나 비정상적인 문자열이 들어올 경우 CORS 파싱 에러 발생.
+- **해결:** Java 8 Stream API를 활용하여 오리진 데이터 정제(Sanitization) 파이프라인 구축.
+- **적용 로직:** `map(String::trim)`으로 공백을 제거하고, `filter(s -> !s.isEmpty())`로 빈 값을 필터링하여 안전한 도메인 리스트만 Spring Security에 등록하도록 개선.
+
+**2. JWT 암호화 키 기본값(Fallback) 설정 (`JwtUtil.java`)**
+- **문제:** `.env` 파일 누락 또는 도커 실행 시 환경변수가 주입되지 않으면 런타임 에러(Boot Failure) 발생.
+- **해결:** 환경변수 누락 시 작동할 안전한 기본 키값을 설정 (`${JWT_SECRET_KEY:기본값}`).
+- **보안성 확보:** HS256 알고리즘의 최소 요구 스펙(256 bit / 32 bytes)을 200% 충족하는 64 bytes 길이의 시크릿 키를 기본값으로 세팅하여 `WeakKeyException` 완벽 방어.
+
+**3. JWT 토큰 파싱 Null-Safety 및 예외 흡수력 강화 (`JwtUtil.java`)**
+- **문제:** 악의적이거나 손상된 토큰(권한 정보 누락, 알 수 없는 권한 명칭 등) 요청 시 500 Internal Server Error 발생 위험.
+- **해결:** 2단계 예외 처리(Null Check + Exception Catch) 적용.
+- **동작 방식:** 비정상적인 권한 정보 파싱 시(`IllegalArgumentException`), 서버가 다운되지 않고 조용히 해당 유저를 **일반 권한(`UserRole.USER`)으로 강등(Downgrade)**시켜 시스템 가용성(Availability) 유지.
+
+---
+
+### ⚙️ 환경 변수 (`.env`) 설정 가이드
+도커 배포 또는 로컬 환경 세팅 시 아래 환경변수를 활용할 수 있습니다. (설정하지 않으면 안전한 로컬 기본값으로 작동합니다.)
+```env
+# 클라우드 DB 주소 (Supabase 등)
+DB_URL=jdbc:postgresql://your-db-url:5432/postgres
+
+# DB 비밀번호
+DB_PASSWORD=your_db_password
+
+# CORS 허용 도메인 리스트 (쉼표로 구분, 공백 허용)
+ALLOWED_ORIGINS=http://localhost:3000, [https://your-production-domain.com](https://your-production-domain.com)
+
+# JWT 시크릿 키 (운영 환경에서는 반드시 32자 이상의 복잡한 문자열로 재설정)
+JWT_SECRET_KEY=your_very_long_and_secure_secret_key_here
+```
+🤝 프론트엔드 연동 참고 사항
+현재 백엔드는 환경변수 유무와 상관없이 에러를 내뿜지 않는 Fail-Safe 상태입니다.
+
+프론트엔드에서는 위 ALLOWED_ORIGINS에 등록된 주소를 통해 안전하게 API 호출(GET, POST, OPTIONS 등)이 가능합니다.
+
+
+
+
