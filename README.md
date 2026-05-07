@@ -1771,5 +1771,12 @@ JWT_SECRET_KEY=your_very_long_and_secure_secret_key_here
 프론트엔드에서는 위 ALLOWED_ORIGINS에 등록된 주소를 통해 안전하게 API 호출(GET, POST, OPTIONS 등)이 가능합니다.
 
 
+**6. 외부 AI (Gemini) 연동 아키텍처 사전 구축 (신규 기여)**
 
+* **개요:** 향후 AI 파트의 맞춤형 음식 효능 및 레시피 추천 기능(FastAPI 연동)을 대비하여, 백엔드 서버에 외부 API 통신 전용 뼈대 및 데이터 통신 규격을 선제적으로 구축했습니다.
+* **주요 기능:**
+  * AI 파트의 예상 응답 포맷(`dish_name`, `additional_ingredients`, `health_benefits`, `recipe_tip`)에 맞춘 전용 수신 객체인 `AiRecipeResponseDto`를 설계하여 JSON 역직렬화(Deserialization)를 대비했습니다.
+  * 프론트엔드에서 AI 추천을 즉시 요청할 수 있도록 `RecipeController`에 `GET /api/recipes/ai-recommendations` 엔드포인트를 개통했습니다.
+* **아키텍처 포인트:** * **관심사 분리 및 시스템 격리:** 기존 DB 의존적인 레시피 비즈니스 로직(`RecipeService`)과 외부 AI 통신 로직(`AiRecipeService`)을 완벽히 분리(Decoupling)했습니다.
+  * 이를 통해 타 서버(AI 서버)의 응답 지연이나 장애가 발생하더라도 백엔드 본 서버의 트랜잭션과 전반적인 가용성에 영향을 주지 않도록 시스템 안정성을 극대화했습니다.
 
