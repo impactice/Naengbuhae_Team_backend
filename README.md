@@ -1771,7 +1771,7 @@ JWT_SECRET_KEY=your_very_long_and_secure_secret_key_here
 프론트엔드에서는 위 ALLOWED_ORIGINS에 등록된 주소를 통해 안전하게 API 호출(GET, POST, OPTIONS 등)이 가능합니다.
 
 
-**6. 외부 AI (Gemini) 연동 아키텍처 사전 구축 **
+**6. 외부 AI (Gemini) 연동 아키텍처 사전 구축**
 
 * **개요:** 향후 AI 파트의 맞춤형 음식 효능 및 레시피 추천 기능(FastAPI 연동)을 대비하여, 백엔드 서버에 외부 API 통신 전용 뼈대 및 데이터 통신 규격을 선제적으로 구축했습니다.
 * **주요 기능:**
