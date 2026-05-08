@@ -1800,3 +1800,37 @@ JWT_SECRET_KEY=your_very_long_and_secure_secret_key_here
 
 
 
+
+
+
+
+EnvFile 설치하기 
+<img width="496" height="849" alt="image" src="https://github.com/user-attachments/assets/5133ca3d-c4ab-4917-8fb2-28dd39537fd9" />
+그리고 설치를 누른다
+<img width="1469" height="996" alt="image" src="https://github.com/user-attachments/assets/1dc7516c-ecd3-4008-b707-132f7b3b6698" />
+
+
+<img width="421" height="215" alt="image" src="https://github.com/user-attachments/assets/6966f7a7-5555-4e32-9ed0-9ab12aad3dac" />
+
+🛠️ 완벽한 2단계 세팅 가이드 
+1. 지우기 (핵심!): 일단 '환경 변수(E)' 칸에 적어둔 C:/2026_TeamProject/Naengbuhae/.env 텍스트를 백스페이스로 싹 지워서 완전 빈칸으로 만들어 줘.
+
+2. 체크하기: 그 바로 밑에 있는 네모난 Enable EnvFile 체크박스를 눌러서 체크(☑️)해 줘.
+
+3. 추가하기: 체크하고 나면 그 아래쪽 영역이 활성화될 텐데, 거기서 + 모양 버튼을 누르고 메뉴에서 .env file을 클릭해.
+
+4. 파일 선택: 파일 탐색기 창이 뜨면, 진짜 우리 프로젝트 폴더 안에 있는 .env 파일을 찾아서 선택(Open)해 줘.
+
+5. 저장: 맨 밑에 파란색 [확인] 버튼을 누르면 완벽하게 끝!
+
+기존 .env파일을 인식하는 건 지워준다
+<img width="1197" height="995" alt="image" src="https://github.com/user-attachments/assets/be567ece-41ac-46db-96af-38af91d5a669" />
+
+.env file을 선택 
+<img width="1198" height="984" alt="image" src="https://github.com/user-attachments/assets/06b1ec68-3b05-43d3-aec8-38c88674c6db" />
+
+그러면 이런 파일이 나온다 
+<img width="933" height="696" alt="image" src="https://github.com/user-attachments/assets/83d4a56a-6a4e-4d4e-818b-4578eba7ead0" />
+
+이렇게 하면 된다
+<img width="1200" height="995" alt="image" src="https://github.com/user-attachments/assets/5cb228d7-1aad-458b-8c63-1adc5797bb81" />
