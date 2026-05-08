@@ -1727,7 +1727,7 @@ api/shopping-list/{id}/toggle (PATCH)
   * 장바구니 ➡️ 냉장고 이관 비즈니스 로직(`ShoppingItemService`) 내에 존재하던 강제 형변환(`intValue()`)을 제거하여 데이터 정합성 100% 확보[cite: 46].
 
 
-## 🛠️ 백엔드 보안 및 아키텍처 개선 (Hotfix 적용 완료) (아직 다 안됨)
+## 🛠️ 백엔드 보안 및 아키텍처 개선 (Hotfix 적용 완료) 
 
 로컬(IntelliJ) 및 도커(Docker) 컨테이너 환경 모두에서 무중단으로 안정적으로 구동되도록 **환경변수 유연성을 확보**하고, 런타임 에러를 사전에 차단하기 위한 **방어적 프로그래밍(Defensive Programming)** 패치를 적용했습니다.
 
