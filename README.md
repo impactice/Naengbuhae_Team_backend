@@ -1809,9 +1809,6 @@ EnvFile 설치하기
 그리고 설치를 누른다
 <img width="1469" height="996" alt="image" src="https://github.com/user-attachments/assets/1dc7516c-ecd3-4008-b707-132f7b3b6698" />
 
-
-<img width="421" height="215" alt="image" src="https://github.com/user-attachments/assets/6966f7a7-5555-4e32-9ed0-9ab12aad3dac" />
-
 🛠️ 완벽한 2단계 세팅 가이드 
 1. 지우기 (핵심!): 일단 '환경 변수(E)' 칸에 적어둔 C:/2026_TeamProject/Naengbuhae/.env 텍스트를 백스페이스로 싹 지워서 완전 빈칸으로 만들어 줘.
 
@@ -1822,6 +1819,8 @@ EnvFile 설치하기
 4. 파일 선택: 파일 탐색기 창이 뜨면, 진짜 우리 프로젝트 폴더 안에 있는 .env 파일을 찾아서 선택(Open)해 줘.
 
 5. 저장: 맨 밑에 파란색 [확인] 버튼을 누르면 완벽하게 끝!
+
+<img width="421" height="215" alt="image" src="https://github.com/user-attachments/assets/6966f7a7-5555-4e32-9ed0-9ab12aad3dac" />
 
 기존 .env파일을 인식하는 건 지워준다
 <img width="1197" height="995" alt="image" src="https://github.com/user-attachments/assets/be567ece-41ac-46db-96af-38af91d5a669" />
