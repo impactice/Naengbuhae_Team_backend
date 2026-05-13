@@ -1870,3 +1870,16 @@ EnvFile 설치하기
   - `expireAfterAccess`: 10분간 미사용된 IP 기록을 메모리에서 자동 퇴출(Eviction)시켜 효율적인 GC(Garbage Collection) 유도 및 시스템 가용성 극대화.
 
 
+### 🚀 운영 환경(Production) 대비 인프라 및 보안 고도화 (v1.2)
+
+실제 서비스 배포 및 운영을 고려하여 백엔드 시스템의 가용성, 보안, 자동화 수준을 대폭 끌어올렸습니다.
+
+- **AOP 기반 감사 로그 정밀화**:
+  - `@Audit` 커스텀 어노테이션에 `idParamName` 속성을 추가하여, 파라미터 순서나 타입이 변경되어도 정확한 Target ID를 추적할 수 있도록 AOP 확장성을 확보했습니다.
+- **실전형 보안 자가 진단 방어막**:
+  - `JwtUtil` 초기화(`@PostConstruct`) 단계에서 기본 시크릿 키 사용 여부를 검사하여, 배포 환경에서 실수로 취약한 키를 사용할 경우 즉시 `CRITICAL SECURITY WARNING` 로그를 발생시키도록 설계했습니다.
+- **메모리 및 DB 부하 방지 (자동화)**:
+  - 무한 증식하는 감사 로그로 인한 DB 병목을 막기 위해 **Spring Scheduler**를 도입, 매월 1일 새벽에 보관 주기(180일)가 지난 로그를 자동 청소(Eviction)합니다. 
+  - Spring Boot 3.2+ 버전 호환성을 고려하여 `@Query` 파라미터 바인딩에 `@Param`을 명시적으로 적용해 런타임 에러를 원천 차단했습니다.
+- **커넥션 풀(HikariCP) 최적화**:
+  - Supabase 무료 티어의 제한된 리소스 환경을 고려하여, `maximum-pool-size`를 명시적으로 조절해 서버의 DB 커넥션 독점 및 고갈(Connection Pool Exhaustion) 사태를 예방했습니다.
