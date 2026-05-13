@@ -1839,7 +1839,7 @@ EnvFile 설치하기
 사용자 맞춤형 레시피 추천을 위해 외부 AI 서버와 통신하는 전용 아키텍처를 구축했습니다.
 
 - **독립된 엔드포인트 개통**: 
-  - 기존 DB 기반 추천(`/api/recipes/recommendations`)과 분리된 **AI 전용 추천 API(`/api/recipes/ai-recommendations`)**를 개통하여 서비스 간 간섭을 최소화했습니다.
+  - 기존 DB 기반 추천(`/api/recipes/recommendations`)과 분리된 AI 전용 추천 API(`/api/recipes/ai-recommendations`)를 개통하여 서비스 간 간섭을 최소화했습니다.
 - **시니어급 Fail-Safe(결함 허용) 방어막 구축**:
   - **타임아웃 설정**: LLM 응답 지연에 대비하여 `RestTemplateBuilder`를 통해 Connect(5s), Read(30s) 타임아웃을 명시적으로 설정했습니다.
   - **예외 복구 로직**: AI 서버 장애나 응답 지연 발생 시, 전체 시스템이 멈추지 않고 사용자에게 우아한 에러 메시지(Fallback Message)를 반환하도록 `try-catch` 방어막을 씌웠습니다.
