@@ -1880,6 +1880,6 @@ EnvFile 설치하기
   - `JwtUtil` 초기화(`@PostConstruct`) 단계에서 기본 시크릿 키 사용 여부를 검사하여, 배포 환경에서 실수로 취약한 키를 사용할 경우 즉시 `CRITICAL SECURITY WARNING` 로그를 발생시키도록 설계했습니다.
 - **메모리 및 DB 부하 방지 (자동화)**:
   - 무한 증식하는 감사 로그로 인한 DB 병목을 막기 위해 **Spring Scheduler**를 도입, 매월 1일 새벽에 보관 주기(180일)가 지난 로그를 자동 청소(Eviction)합니다. 
-  - Spring Boot 3.2+ 버전 호환성을 고려하여 `@Query` 파라미터 바인딩에 `@Param`을 명시적으로 적용해 런타임 에러를 원천 차단했습니다.
+  - **[Troubleshooting]** Spring Boot 3.2+ 버전 호환성을 고려하여, `AuditLogRepository`의 JPQL 파라미터 바인딩 시 `@Param` 어노테이션을 명시적으로 적용해 리눅스/클라우드 배포 환경에서의 런타임 에러(`IllegalArgumentException`)를 원천 차단했습니다.
 - **커넥션 풀(HikariCP) 최적화**:
-  - Supabase 무료 티어의 제한된 리소스 환경을 고려하여, `maximum-pool-size`를 명시적으로 조절해 서버의 DB 커넥션 독점 및 고갈(Connection Pool Exhaustion) 사태를 예방했습니다.
+  - Supabase 무료 티어의 제한된 리소스 환경을 고려하여, `maximum-pool-size`를 명시적으로 10으로 제한해 서버의 DB 커넥션 독점 및 고갈 사태를 예방했습니다.
