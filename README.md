@@ -1893,5 +1893,23 @@ EnvFile 설치하기
 - **보안 패치 (Security Update)**: 정적 분석 도구(Mend.io)를 통해 식별된 `jjwt` 라이브러리의 암호화 취약점(CVE-2024-31033)을 선제적으로 패치하여 인증 시스템의 안전성을 확보했습니다.
 - **테스트 정합성 유지**: 변경된 비즈니스 로직에 맞추어 `MockMvc` 및 `Mockito` 기반의 단위 테스트 코드를 전면 갱신하여 100% 테스트 통과(`BUILD SUCCESSFUL`)를 달성했습니다.
 
+### 💎 전역 코드 베이스 최적화 및 아키텍처 정밀 튜닝 (v1.4)
 
+프로젝트 전반에 걸쳐 잔존하던 기술적 부채를 완전히 청산하고, 시니어급 개발 표준에 맞춘 전수 리팩토링을 완료했습니다.
+
+- **Java 17 문법 전역 확산 (Modernization)**:
+  - `FridgeService`, `RecipeService`, `SecurityConfig` 등 프로젝트 전역에서 사용되던 구식 `.collect(Collectors.toList())`를 Java 17 표준인 `.toList()`로 전수 교체했습니다.
+  - 이를 통해 불필요한 보일러플레이트 코드를 제거하고 리스트의 불변성(Immutability)을 확보하여 데이터 무결성을 강화했습니다.
+
+- **컨트롤러 계층 구조 혁신 (Architectural Integrity)**:
+  - `UserController` 내 이메일 인증 및 비밀번호 재설정 로직에 산재해 있던 개별 `try-catch` 구문을 모두 제거했습니다.
+  - 모든 비즈니스 예외는 `GlobalExceptionHandler`에서 중앙 집중식으로 처리하도록 아키텍처를 정립하여, 컨트롤러의 가독성을 극대화하고 에러 응답 규격을 100% 통일했습니다.
+
+- **코드 클린업 및 정적 분석 대응 (Clean Code)**:
+  - 컨트롤러 내 불필요한 패키지 풀네임 참조(`com.example...ApiResponse`)를 제거하고 임포트 최적화를 수행하여 코드 가독성을 높였습니다.
+  - 인텔리제이 정적 분석 기반의 잔여 경고(Warning)를 전수 조사하여 해결함으로써 'Zero Warning' 수준의 코드 품질을 달성했습니다.
+
+- **병합 무결성 확보 (Conflict Resolution)**:
+  - 팀원과의 협업 과정에서 발생한 Git 충돌(Merge Conflict)을 해결하며 최신 리팩토링 로직과 신규 기능(냉장고 생성, 이메일 발송)을 완벽하게 통합했습니다.
+  - 전수 테스트(`BUILD SUCCESSFUL`)를 통해 리팩토링 이후에도 기존 기능이 완벽하게 작동함을 검증했습니다.
 
