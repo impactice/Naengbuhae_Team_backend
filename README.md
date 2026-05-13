@@ -1863,6 +1863,10 @@ EnvFile 설치하기
 - **Fail-Fast 로직 적용**:
   - 식재료가 없는 상태에서의 불필요한 AI 호출을 백엔드 단에서 사전에 차단하여 네트워크 비용을 절감했습니다.
 
-
+### 🛡️ 트래픽 및 메모리 최적화 (OOM 방어)
+- **문제 인식**: 기존 `RateLimitFilter`가 `ConcurrentHashMap`을 사용하여 무한정 IP 기록을 적재, 악의적인 트래픽 공격(DDoS 등) 시 서버 메모리 고갈(OOM) 위험 존재.
+- **해결 방안**: 로컬 캐시 라이브러리인 **Caffeine Cache**를 도입하여 방어 로직 고도화.
+  - `maximumSize(10000)`: IP 기록의 최대치를 제한하여 메모리 공간 보호.
+  - `expireAfterAccess`: 10분간 미사용된 IP 기록을 메모리에서 자동 퇴출(Eviction)시켜 효율적인 GC(Garbage Collection) 유도 및 시스템 가용성 극대화.
 
 
